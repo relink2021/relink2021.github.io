@@ -86,7 +86,7 @@ you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p
 Methods)\)</span></p>
 <p>模板：确保父类控制处理流程的逻辑顺序，需要保证<strong>模板的严肃性</strong>(final)</p>
 <p>应用：框架设计</p>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="PLAINTEXT"><figure class="iseeu highlight /plaintext"><table><tr><td class="code"><pre><span class="line">AbstractClass &#123;</span><br><span class="line">	method1()</span><br><span class="line">	method2()</span><br><span class="line">	method3()</span><br><span class="line">	templateMethod() // 规定method1-3的处理逻辑</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SCSS"><figure class="iseeu highlight /scss"><table><tr><td class="code"><pre><span class="line">AbstractClass &#123;</span><br><span class="line">	<span class="built_in">method1</span>()</span><br><span class="line">	<span class="built_in">method2</span>()</span><br><span class="line">	<span class="built_in">method3</span>()</span><br><span class="line">	<span class="built_in">templateMethod</span>() <span class="comment">// 规定method1-3的处理逻辑</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
 <p><img src="/2022/04/29/Design%20Patterns/image-20220419103112374.png" alt="image-20220419103112374" style="zoom:80%;"></p>
 <p><strong>好莱坞原则</strong>：子类不显式调用父类的方法，而是通过覆盖父类的方法实现业务逻辑，父类控制对子类的调用</p>
 <div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">AbstractDisplay</span> &#123;</span><br><span class="line">   <span class="comment">// 三个抽象方法，子类可重定义</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">open</span><span class="params">()</span>; </span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">print</span><span class="params">()</span>;</span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span>;</span><br><span class="line">   <span class="comment">// 模板方法，规定执行顺序，必须用final修饰</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">display</span><span class="params">()</span> &#123;</span><br><span class="line">       open();</span><br><span class="line">       <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">           print();</span><br><span class="line">       &#125;</span><br><span class="line">       close();</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></div>
@@ -242,6 +242,54 @@ Factory：抽象工厂模式</h4>
 ]]></content>
       <tags>
         <tag>OO</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>序列化和反序列化</title>
+    <url>/2022/04/29/%E5%BA%8F%E5%88%97%E5%8C%96%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</url>
+    <content><![CDATA[<h4 id="序列化和反序列化的定义">序列化和反序列化的定义</h4>
+<p><strong>序列化</strong>：把对象转化为可传输的字节序列的过程</p>
+<p><strong>反序列化</strong>：把字节序列还原为对象的过程</p>
+<hr>
+<h4 id="为什么要序列化">为什么要序列化</h4>
+<p><strong>目的</strong>：让对象可以<strong>跨平台存储</strong>和进行<strong>网络传输</strong></p>
+<p><strong>因果</strong>：网络传输的方式是I/O <span class="math inline">\(\rightarrow\)</span> I/O支持的数据格式为字节数组
+<span class="math inline">\(\rightarrow\)</span>
+对象要传输需要序列化为字节序列</p>
+<p><strong>规范</strong>：序列化需要遵循规则，使得传输到目的地的字节序列能通过该规则反序列化还原为对象</p>
+<hr>
+<h4 id="需要序列化的场景">需要序列化的场景</h4>
+<p>凡是需要<strong>跨平台存储</strong>和<strong>网络传输</strong>的数据，都需要序列化</p>
+<p>网络传输本质：对象 <span class="math inline">\(\rightarrow\)</span>
+字节序列 <span class="math inline">\(\rightarrow\)</span> 网络 <span class="math inline">\(\rightarrow\)</span> 字节序列 <span class="math inline">\(\rightarrow\)</span> 对象</p>
+<p>跨平台存储本质：对象 <span class="math inline">\(\rightarrow\)</span>
+跨平台字节码 <span class="math inline">\(\rightarrow\)</span> 跨平台
+<span class="math inline">\(\rightarrow\)</span> 跨平台字节码 <span class="math inline">\(\rightarrow\)</span> 对象</p>
+<hr>
+<h4 id="序列化的选择">序列化的选择</h4>
+<p><strong>常见的序列化方式</strong></p>
+<p>不支持跨语言：JDK、Kryo、FST</p>
+<p>支持跨语言：JSON、Hessian、Thrift、Protostuff</p>
+<p><strong>序列化的速度</strong></p>
+<p>如果一个项目中需要序列化的场景很多，那么选择序列化效率高的协议能显著提高系统性能</p>
+<p><strong>序列化字节序列的大小</strong></p>
+<p>数据越小越好，传输快，提升系统性能</p>
+<hr>
+<h4 id="java中的序列化">Java中的序列化</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Java中要实现序列化，只需要实现Serializable接口即可</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment"> * 需要注意的问题</span></span><br><span class="line"><span class="comment"> * 1. static属性不能被序列化</span></span><br><span class="line"><span class="comment"> * 序列化保存的是对象的状态，静态变量属于类的状态，因此序列化不保存静态变量</span></span><br><span class="line"><span class="comment"> * 2. transient属性不会被序列化</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">transient</span> ElemType t;</span><br><span class="line">    <span class="keyword">private</span> ElemType e;    </span><br><span class="line">    <span class="comment">// 经过序列化和反序列化，t中的值会丢失(t == null)，e中的值不会丢失(e == something)</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h4 id="序列化版本号serialversionuid">序列化版本号serialVersionUID</h4>
+<p>所有实现序列化的对象都必须有一个版本号，可以自定义，否则JDK工具会按照对象属性自动生成</p>
+<p><strong>版本号的用途</strong></p>
+<p>在序列化业务需求发生变化后，通过修改版本号告诉反序列化一方的对象需要同步修改</p>
+<p><strong>JDK自动生成的版本号和我们自定义的版本号的区别</strong></p>
+<p>JDK根据对象的属性信息生成版本号，意味着对象的属性和序列化版本号会同步改变</p>
+<p>坏处：只要对象有一点小变动版本号就会变更，用户必须强制更新软件，而现实需求应该是：<strong>用户可以选择不更新，不更新仅仅无法体验新增加的功能而已</strong>，而这时候就需要我们自定义的版本号了，<strong>只要序列化版本一样，对象新增属性不会影响反序列化对象</strong>。</p>
+<hr>
+<h4 id="父类子类序列化问题">父类、子类序列化问题</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1.父类不实现序列化，子类实现序列化</span></span><br><span class="line"><span class="comment">// 父类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Parent</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String hobby;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">extends</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化后再反序列化</span></span><br><span class="line"><span class="comment">// 最终结果：父类结果未被序列化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2.父类实现序列化，子类不实现序列化</span></span><br><span class="line"><span class="comment">// 父类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String hobby;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">extends</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化后再反序列化</span></span><br><span class="line"><span class="comment">// 最终结果：子类属性序列化正常</span></span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <tags>
+        <tag>Java</tag>
       </tags>
   </entry>
   <entry>
@@ -483,54 +531,6 @@ vs 自动化测试：<u>从是否需要人工介入来区分</u></h4>
 ]]></content>
       <tags>
         <tag>软件测试</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>序列化和反序列化</title>
-    <url>/2022/04/29/%E5%BA%8F%E5%88%97%E5%8C%96%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</url>
-    <content><![CDATA[<h4 id="序列化和反序列化的定义">序列化和反序列化的定义</h4>
-<p><strong>序列化</strong>：把对象转化为可传输的字节序列的过程</p>
-<p><strong>反序列化</strong>：把字节序列还原为对象的过程</p>
-<hr>
-<h4 id="为什么要序列化">为什么要序列化</h4>
-<p><strong>目的</strong>：让对象可以<strong>跨平台存储</strong>和进行<strong>网络传输</strong></p>
-<p><strong>因果</strong>：网络传输的方式是I/O <span class="math inline">\(\rightarrow\)</span> I/O支持的数据格式为字节数组
-<span class="math inline">\(\rightarrow\)</span>
-对象要传输需要序列化为字节序列</p>
-<p><strong>规范</strong>：序列化需要遵循规则，使得传输到目的地的字节序列能通过该规则反序列化还原为对象</p>
-<hr>
-<h4 id="需要序列化的场景">需要序列化的场景</h4>
-<p>凡是需要<strong>跨平台存储</strong>和<strong>网络传输</strong>的数据，都需要序列化</p>
-<p>网络传输本质：对象 <span class="math inline">\(\rightarrow\)</span>
-字节序列 <span class="math inline">\(\rightarrow\)</span> 网络 <span class="math inline">\(\rightarrow\)</span> 字节序列 <span class="math inline">\(\rightarrow\)</span> 对象</p>
-<p>跨平台存储本质：对象 <span class="math inline">\(\rightarrow\)</span>
-跨平台字节码 <span class="math inline">\(\rightarrow\)</span> 跨平台
-<span class="math inline">\(\rightarrow\)</span> 跨平台字节码 <span class="math inline">\(\rightarrow\)</span> 对象</p>
-<hr>
-<h4 id="序列化的选择">序列化的选择</h4>
-<p><strong>常见的序列化方式</strong></p>
-<p>不支持跨语言：JDK、Kryo、FST</p>
-<p>支持跨语言：JSON、Hessian、Thrift、Protostuff</p>
-<p><strong>序列化的速度</strong></p>
-<p>如果一个项目中需要序列化的场景很多，那么选择序列化效率高的协议能显著提高系统性能</p>
-<p><strong>序列化字节序列的大小</strong></p>
-<p>数据越小越好，传输快，提升系统性能</p>
-<hr>
-<h4 id="java中的序列化">Java中的序列化</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Java中要实现序列化，只需要实现Serializable接口即可</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment"> * 需要注意的问题</span></span><br><span class="line"><span class="comment"> * 1. static属性不能被序列化</span></span><br><span class="line"><span class="comment"> * 序列化保存的是对象的状态，静态变量属于类的状态，因此序列化不保存静态变量</span></span><br><span class="line"><span class="comment"> * 2. transient属性不会被序列化</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">transient</span> ElemType t;</span><br><span class="line">    <span class="keyword">private</span> ElemType e;    </span><br><span class="line">    <span class="comment">// 经过序列化和反序列化，t中的值会丢失(t == null)，e中的值不会丢失(e == something)</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h4 id="序列化版本号serialversionuid">序列化版本号serialVersionUID</h4>
-<p>所有实现序列化的对象都必须有一个版本号，可以自定义，否则JDK工具会按照对象属性自动生成</p>
-<p><strong>版本号的用途</strong></p>
-<p>在序列化业务需求发生变化后，通过修改版本号告诉反序列化一方的对象需要同步修改</p>
-<p><strong>JDK自动生成的版本号和我们自定义的版本号的区别</strong></p>
-<p>JDK根据对象的属性信息生成版本号，意味着对象的属性和序列化版本号会同步改变</p>
-<p>坏处：只要对象有一点小变动版本号就会变更，用户必须强制更新软件，而现实需求应该是：<strong>用户可以选择不更新，不更新仅仅无法体验新增加的功能而已</strong>，而这时候就需要我们自定义的版本号了，<strong>只要序列化版本一样，对象新增属性不会影响反序列化对象</strong>。</p>
-<hr>
-<h4 id="父类子类序列化问题">父类、子类序列化问题</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1.父类不实现序列化，子类实现序列化</span></span><br><span class="line"><span class="comment">// 父类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Parent</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String hobby;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">extends</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化后再反序列化</span></span><br><span class="line"><span class="comment">// 最终结果：父类结果未被序列化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2.父类实现序列化，子类不实现序列化</span></span><br><span class="line"><span class="comment">// 父类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String hobby;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">extends</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化后再反序列化</span></span><br><span class="line"><span class="comment">// 最终结果：子类属性序列化正常</span></span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <tags>
-        <tag>Java</tag>
       </tags>
   </entry>
   <entry>

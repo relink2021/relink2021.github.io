@@ -960,7 +960,7 @@ vs 自动化测试：<u>从是否需要人工介入来区分</u></h4>
 Methods)\)</span></p>
 <p>模板：确保父类控制处理流程的逻辑顺序，需要保证<strong>模板的严肃性</strong>(final)</p>
 <p>应用：框架设计</p>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="PLAINTEXT"><figure class="iseeu highlight /plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">AbstractClass &#123;</span><br><span class="line">	method1()</span><br><span class="line">	method2()</span><br><span class="line">	method3()</span><br><span class="line">	templateMethod() // 规定method1-3的处理逻辑</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SCSS"><figure class="iseeu highlight /scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">AbstractClass &#123;</span><br><span class="line">	<span class="built_in">method1</span>()</span><br><span class="line">	<span class="built_in">method2</span>()</span><br><span class="line">	<span class="built_in">method3</span>()</span><br><span class="line">	<span class="built_in">templateMethod</span>() <span class="comment">// 规定method1-3的处理逻辑</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
 <p><img src="/2022/04/29/Design%20Patterns/image-20220419103112374.png" alt="image-20220419103112374" style="zoom:80%;"></p>
 <p><strong>好莱坞原则</strong>：子类不显式调用父类的方法，而是通过覆盖父类的方法实现业务逻辑，父类控制对子类的调用</p>
 <div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">AbstractDisplay</span> &#123;</span><br><span class="line">   <span class="comment">// 三个抽象方法，子类可重定义</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">open</span><span class="params">()</span>; </span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">print</span><span class="params">()</span>;</span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span>;</span><br><span class="line">   <span class="comment">// 模板方法，规定执行顺序，必须用final修饰</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">display</span><span class="params">()</span> &#123;</span><br><span class="line">       open();</span><br><span class="line">       <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">           print();</span><br><span class="line">       &#125;</span><br><span class="line">       close();</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></div>
@@ -1155,10 +1155,16 @@ Factory：抽象工厂模式</h4>
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-04-29 14:32:38 / 修改时间：14:39:46" itemprop="dateCreated datePublished" datetime="2022-04-29T14:32:38+08:00">2022-04-29</time>
+              <time title="创建时间：2022-04-29 14:32:38" itemprop="dateCreated datePublished" datetime="2022-04-29T14:32:38+08:00">2022-04-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-05 10:26:29" itemprop="dateModified" datetime="2022-05-05T10:26:29+08:00">2022-05-05</time>
+              </span>
 
           
 

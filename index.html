@@ -188,6 +188,133 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/05/Decorator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="HWH">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Relink">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/05/Decorator/" class="post-title-link" itemprop="url">Decorator——装饰器</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-05-05 15:47:20 / 修改时间：17:49:44" itemprop="dateCreated datePublished" datetime="2022-05-05T15:47:20+08:00">2022-05-05</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="background">Background</h3>
+<p>现实生活中有各种各样的装饰：穿衣服、刷油漆、给图画装裱相框、加Buff......</p>
+<p><img src="/2022/05/05/Decorator/R.png" alt="未装饰前" style="zoom:80%;"></p>
+<p><img src="/2022/05/05/Decorator/1000-1651737476679.png" alt="装饰后(至臻)" style="zoom:80%;"></p>
+<p>回到编程上，我们通常可以采用<strong>继承</strong>来实现功能的扩展，但是如果这些需要扩展的功能很多时</p>
+<ul>
+<li>会产生很多子类，<strong>增加系统复杂性</strong></li>
+<li>这些功能编译时就已经确定，是<strong>静态</strong>的</li>
+</ul>
+<p>这个时候应该怎么办？</p>
+<h3 id="decorator">Decorator</h3>
+<p><strong>动态(即插即用)</strong>地给一个<strong>对象(而非一个类，不影响其他对象)</strong>添加一些额外的职责</p>
+<p>参与者协作者：</p>
+<ol type="1">
+<li><p><strong>Component</strong>：定义一个对象接口，可以给这些对象动态地添加职责。</p></li>
+<li><p><strong>ConcreteComponent</strong>：定义一个对象，可以给这个对象添加一些职责</p></li>
+<li><p><strong>Decorater</strong></p></li>
+<li><p><strong>ConcreteDecorator</strong></p></li>
+</ol>
+<p><strong>适用情况举例</strong>：</p>
+<ol type="1">
+<li>不影响其他对象的情况下，<strong>动态</strong>地给单个对象添加职责</li>
+<li><strong>处理可以撤销的职责</strong></li>
+<li><strong>不能采用继承</strong>的方式进行扩充时</li>
+</ol>
+<blockquote>
+<p>注意：装饰的顺序很重要！装饰器很容易出错，应谨慎适用！装饰器会增大系统复杂度！</p>
+</blockquote>
+<h3 id="example">Example</h3>
+<p>下面举一些装饰器的例子：</p>
+<p><img src="/2022/05/05/Decorator/image-20220505161616059.png" alt="image-20220505161616059" style="zoom:80%;"></p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 抽象构件类: InputStream</span></span><br><span class="line"><span class="comment"> * 具体构件类: FileInputStream、ByteArrayInputStream</span></span><br><span class="line"><span class="comment"> * 抽象装饰类: FilterInputStream</span></span><br><span class="line"><span class="comment"> * 具体装饰类: BufferedInputStream、DataInputStream</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="comment">// 只针对对象reader1进行动态配置，添加读取文件职责</span></span><br><span class="line"><span class="type">Reader</span> <span class="variable">reader1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LineNumberReader</span>(<span class="keyword">new</span> <span class="title class_">BufferReader</span>(<span class="keyword">new</span> <span class="title class_">FileReader</span>(<span class="string">&quot;test.txt&quot;</span>)));</span><br><span class="line"><span class="comment">// 只针对对象reader2进行动态配置，添加读取输入流职责</span></span><br><span class="line"><span class="type">Reader</span> <span class="variable">reader2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LineNumberReader</span>(<span class="keyword">new</span> <span class="title class_">BufferReader</span>(<span class="keyword">new</span> <span class="title class_">InputStreamReader</span>(Socket.getInputStream())));</span><br></pre></td></tr></table></figure></div>
+<h3 id="extension">Extension</h3>
+<p>装饰模式分为<strong>透明</strong>和<strong>半透明</strong>两种，大部分情况下都是采用半透明方式，半透明的装饰模式介于装饰模式和适配器模式之间。</p>
+<h5 id="一透明装饰模式">一、透明装饰模式</h5>
+<p>透明装饰模式就是<strong>纯粹为了装饰</strong>，而忽视增强性能的需要。实例代码如下：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/relink2021/DesignPatternHomework/tree/master/src/Homework10">完整代码</a></p>
+</blockquote>
+<ul>
+<li>还是以奶茶为例，定义抽象构件：奶茶</li>
+</ul>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 抽象奶茶接口，需要定义名称和价格 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">MilkTea</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getName</span><span class="params">()</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getPrice</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<ul>
+<li>下面是两个具体构件：珍珠奶茶和板栗奶茶</li>
+</ul>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 珍珠奶茶 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PearlMilkTea</span> <span class="keyword">implements</span> <span class="title class_">MilkTea</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getName</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;珍珠奶茶&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getPrice</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">8</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 板栗奶茶 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ChestnutMilkTea</span> <span class="keyword">implements</span> <span class="title class_">MilkTea</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getName</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;板栗奶茶&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getPrice</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">13</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<ul>
+<li>奶茶有各种风味，定义抽象装饰类Taste：</li>
+</ul>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Taste</span> <span class="keyword">implements</span> <span class="title class_">MilkTea</span> &#123;</span><br><span class="line">    MilkTea milkTea;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Taste</span><span class="params">(MilkTea milkTea)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.milkTea = milkTea;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getName</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> milkTea.getName();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getPrice</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> milkTea.getPrice();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<ul>
+<li>下面是奶茶具体的口味，具体装饰类：</li>
+</ul>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 加冰块 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">IceTaste</span> <span class="keyword">extends</span> <span class="title class_">Taste</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">description</span> <span class="operator">=</span> <span class="string">&quot;加冰&quot;</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">IceTaste</span><span class="params">(MilkTea milkTea)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(milkTea);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* 添加属性 */</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getName</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">super</span>.getName() + <span class="string">&quot; &quot;</span> + description;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* 加冰多加3块 */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getPrice</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">super</span>.getPrice() + <span class="number">3</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 加冰淇凌 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Ice_Cream</span> <span class="keyword">extends</span> <span class="title class_">Taste</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">description</span> <span class="operator">=</span> <span class="string">&quot;加冰淇凌&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Ice_Cream</span><span class="params">(MilkTea milkTea)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(milkTea);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* 添加属性 */</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getName</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">super</span>.getName() + <span class="string">&quot; &quot;</span> + description;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* 额外付5元 */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getPrice</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">super</span>.getPrice() + <span class="number">5</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<ul>
+<li>测试装饰器的功能：</li>
+</ul>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="comment">// 买了一杯珍珠奶茶，加冰淇凌</span></span><br><span class="line">        <span class="type">MilkTea</span> <span class="variable">pearlMilkTea</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PearlMilkTea</span>();</span><br><span class="line">        pearlMilkTea = <span class="keyword">new</span> <span class="title class_">Ice_Cream</span>(pearlMilkTea);</span><br><span class="line">        System.out.print(pearlMilkTea.getName() + <span class="string">&quot; &quot;</span>);</span><br><span class="line">        System.out.println(pearlMilkTea.getPrice() + <span class="string">&quot;元&quot;</span>);</span><br><span class="line">        <span class="comment">// 买了一杯板栗奶茶，加冰块</span></span><br><span class="line">        <span class="type">MilkTea</span> <span class="variable">chestnutMilkTea</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChestnutMilkTea</span>();</span><br><span class="line">        chestnutMilkTea = <span class="keyword">new</span> <span class="title class_">IceTaste</span>(chestnutMilkTea);</span><br><span class="line">        System.out.print(chestnutMilkTea.getName() + <span class="string">&quot; &quot;</span>);</span><br><span class="line">        System.out.println(chestnutMilkTea.getPrice() + <span class="string">&quot;元&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 运行结果为：</span></span><br><span class="line"><span class="comment"> * 珍珠奶茶 加冰淇凌 13元</span></span><br><span class="line"><span class="comment"> * 板栗奶茶 加冰 16元</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure></div>
+<p>透明装饰模式对特定对象进行装饰，对其添加特定职责(Taste为奶茶添加了风味，由奶茶负责展示风味)</p>
+<h5 id="二半透明装饰模式">二、半透明装饰模式</h5>
+<p>实际应用中大部分都是采取半透明的装饰方式，半透明装饰不止于给特定对象添加职责，还允许装饰模式改变方法，增加新的接口。</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 半透明装饰: 改变接口，增加新的方法</span></span><br><span class="line"><span class="comment"> * 客户端可以生命具体装饰类，并调用具体装饰类中的方法</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">IceTaste</span> <span class="keyword">extends</span> <span class="title class_">Taste</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">iceEffect</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;奶茶很冰&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Ice_Cream</span> <span class="keyword">extends</span> <span class="title class_">Taste</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">ice_Cream_Effect</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;冰淇凌很甜&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="comment">/* 买了一杯珍珠奶茶，加冰淇凌 */</span></span><br><span class="line">        <span class="type">MilkTea</span> <span class="variable">pearlMilkTea</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PearlMilkTea</span>();</span><br><span class="line">        <span class="comment">/* 实例化Ice_Cream并使用方法 */</span></span><br><span class="line">        <span class="type">Ice_Cream</span> <span class="variable">ice_cream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Ice_Cream</span>(pearlMilkTea);</span><br><span class="line">        System.out.println(ice_cream.ice_Cream_Effect());</span><br><span class="line">		<span class="comment">/* 实例化IceTaste并使用方法 */</span></span><br><span class="line">        <span class="type">IceTaste</span> <span class="variable">iceTaste</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">IceTaste</span>(pearlMilkTea);</span><br><span class="line">        System.out.println(iceTaste.iceEffect());  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h3 id="summary">Summary</h3>
+<ol type="1">
+<li>装饰器模式的目标是对象而非类，不同对象经过装饰器装饰后可能有完全不同的职责。</li>
+<li>装饰器有透明装饰和半透明装饰两种，区别在于半透明装饰除了装饰本身外，还允许具体装饰类扩展方法，强化系统功能。</li>
+<li>装饰器存在多层嵌套的情况，此时装饰的顺序不能出错，需要小心谨慎。</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/05/Bridge/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -213,7 +340,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-05-05 10:48:55 / 修改时间：15:37:25" itemprop="dateCreated datePublished" datetime="2022-05-05T10:48:55+08:00">2022-05-05</time>
+              <time title="创建时间：2022-05-05 10:48:55 / 修改时间：16:04:46" itemprop="dateCreated datePublished" datetime="2022-05-05T10:48:55+08:00">2022-05-05</time>
             </span>
 
           
@@ -1506,7 +1633,7 @@ you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hex
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

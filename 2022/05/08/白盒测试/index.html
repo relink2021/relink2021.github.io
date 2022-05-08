@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="白盒测试 白盒测试把程序视为一个透明的盒子，根据程序内部结构设计测试用例，测试需要覆盖全部代码的分支、路径和条件  白盒测试有静态测试和动态测试两种方法 静态测试(程序结构分析) 代码走查：一组程序 + 错误检查技术 人员：组长(分配资料、安排计划) + 资深程序员 + 测试人员 + 程序开发员 内容：探讨代码编写思路 代码审查  检查代码和设计的一致性 代码可读性 代">
+  <meta name="description" content="白盒测试白盒测试把程序视为一个透明的盒子，根据程序内部结构设计测试用例，测试需要覆盖全部代码的分支、路径和条件   白盒测试有静态测试和动态测试两种方法 静态测试(程序结构分析)代码走查：一组程序 + 错误检查技术人员：组长(分配资料、安排计划) + 资深程序员 + 测试人员 + 程序开发员 内容：探讨代码编写思路 代码审查 检查代码和设计的一致性 代码可读性 代码逻辑正确性 代码结构合理性 公司">
 <meta property="og:type" content="article">
 <meta property="og:title" content="白盒测试">
 <meta property="og:url" content="http://example.com/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/index.html">
 <meta property="og:site_name" content="Relink">
-<meta property="og:description" content="白盒测试 白盒测试把程序视为一个透明的盒子，根据程序内部结构设计测试用例，测试需要覆盖全部代码的分支、路径和条件  白盒测试有静态测试和动态测试两种方法 静态测试(程序结构分析) 代码走查：一组程序 + 错误检查技术 人员：组长(分配资料、安排计划) + 资深程序员 + 测试人员 + 程序开发员 内容：探讨代码编写思路 代码审查  检查代码和设计的一致性 代码可读性 代">
+<meta property="og:description" content="白盒测试白盒测试把程序视为一个透明的盒子，根据程序内部结构设计测试用例，测试需要覆盖全部代码的分支、路径和条件   白盒测试有静态测试和动态测试两种方法 静态测试(程序结构分析)代码走查：一组程序 + 错误检查技术人员：组长(分配资料、安排计划) + 资深程序员 + 测试人员 + 程序开发员 内容：探讨代码编写思路 代码审查 检查代码和设计的一致性 代码可读性 代码逻辑正确性 代码结构合理性 公司">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220502000324686.png">
 <meta property="og:image" content="http://example.com/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508123614063.png">
@@ -37,7 +37,7 @@
 <meta property="og:image" content="http://example.com/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651986336995.jpg">
 <meta property="og:image" content="http://example.com/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651987244264.jpg">
 <meta property="og:image" content="http://example.com/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317194219038.png">
-<meta property="og:image" content="http://example.com/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508141945220.png">
+<meta property="og:image" content="http://example.com/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508141945220.png">
 <meta property="og:image" content="http://example.com/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142428384.png">
 <meta property="og:image" content="http://example.com/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142455731.png">
 <meta property="og:image" content="http://example.com/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142505675.png">
@@ -248,176 +248,170 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="白盒测试">白盒测试</h2>
-<p>白盒测试把程序视为一个<strong>透明的盒子</strong>，根据<strong>程序内部结构</strong>设计测试用例，测试需要<strong>覆盖全部代码的分支、路径和条件</strong></p>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220502000324686.png" alt="image-20220502000324686" style="zoom:67%;"></p>
+        <h2 id="白盒测试"><a href="#白盒测试" class="headerlink" title="白盒测试"></a>白盒测试</h2><p>白盒测试把程序视为一个<strong>透明的盒子</strong>，根据<strong>程序内部结构</strong>设计测试用例，测试需要<strong>覆盖全部代码的分支、路径和条件</strong></p>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220502000324686.png" alt="image-20220502000324686" style="zoom:67%;">
+
 <p>白盒测试有<u>静态测试和动态测试</u>两种方法</p>
-<h2 id="静态测试程序结构分析">静态测试(程序结构分析)</h2>
-<h5 id="代码走查一组程序-错误检查技术">代码走查：一组程序 +
-错误检查技术</h5>
-<p>人员：组长(分配资料、安排计划) + 资深程序员 + 测试人员 +
-程序开发员</p>
+<h2 id="静态测试-程序结构分析"><a href="#静态测试-程序结构分析" class="headerlink" title="静态测试(程序结构分析)"></a>静态测试(程序结构分析)</h2><h5 id="代码走查：一组程序-错误检查技术"><a href="#代码走查：一组程序-错误检查技术" class="headerlink" title="代码走查：一组程序 + 错误检查技术"></a>代码走查：一组程序 + 错误检查技术</h5><p>人员：组长(分配资料、安排计划) + 资深程序员 + 测试人员 + 程序开发员</p>
 <p>内容：探讨代码编写思路</p>
-<h5 id="代码审查">代码审查</h5>
-<ol type="1">
+<h5 id="代码审查"><a href="#代码审查" class="headerlink" title="代码审查"></a>代码审查</h5><ol>
 <li>检查代码和设计的一致性</li>
 <li>代码可读性</li>
 <li>代码逻辑正确性</li>
 <li>代码结构合理性</li>
 <li>公司整理的易错点checklist</li>
 </ol>
-<p>步骤：准备 <span class="math inline">\(\rightarrow\)</span> 程序阅读
-<span class="math inline">\(\rightarrow\)</span> 审查会 <span class="math inline">\(\rightarrow\)</span> 跟踪报告</p>
-<h5 id="控制流分析检查程序的控制结构">控制流分析：检查程序的控制结构</h5>
-<ul>
+<p>步骤：准备 $\rightarrow$ 程序阅读 $\rightarrow$ 审查会 $\rightarrow$ 跟踪报告</p>
+<h5 id="控制流分析：检查程序的控制结构"><a href="#控制流分析：检查程序的控制结构" class="headerlink" title="控制流分析：检查程序的控制结构"></a>控制流分析：检查程序的控制结构</h5><ul>
 <li><p><strong>程序流程图</strong></p>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508123614063.png" alt="image-20220508123614063" style="zoom:67%;"></p></li>
-<li><p><strong>控制流图(必考)</strong></p></li>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508123614063.png" alt="image-20220508123614063" style="zoom:67%;">
+</li>
+<li><p><strong>控制流图(必考)</strong></p>
+</li>
 </ul>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317170655642.png" alt="image-20220317170655642" style="zoom:60%;"></p>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317170655642.png" alt="image-20220317170655642" style="zoom:60%;">
+
 <ul>
 <li><strong>控制流图矩阵(控制流图的矩阵形式)</strong></li>
 </ul>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317170914579.png" alt="image-20220317170914579" style="zoom:67%;"></p>
-<h5 id="数据流分析程序错误">数据流分析(程序错误)</h5>
-<ul>
-<li><p>如果某一语句执行能<strong>改变变量x的值</strong>，则称x被该语句<strong>定义</strong></p></li>
-<li><p>如果某一语句执行了<strong>内存中变量x的值</strong>，则称x被该语句<strong>引用</strong></p></li>
-<li><p>常见的程序错误有：错拼名字、名字混淆、语句丢失等(一般都是编译器能检测的错误)</p></li>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317170914579.png" alt="image-20220317170914579" style="zoom:67%;">
+
+<h5 id="数据流分析-程序错误"><a href="#数据流分析-程序错误" class="headerlink" title="数据流分析(程序错误)"></a>数据流分析(程序错误)</h5><ul>
+<li><p>如果某一语句执行能<strong>改变变量x的值</strong>，则称x被该语句<strong>定义</strong></p>
+</li>
+<li><p>如果某一语句执行了<strong>内存中变量x的值</strong>，则称x被该语句<strong>引用</strong></p>
+</li>
+<li><p>常见的程序错误有：错拼名字、名字混淆、语句丢失等(一般都是编译器能检测的错误)</p>
+</li>
 </ul>
-<h5 id="信息流分析">信息流分析</h5>
-<ul>
+<h5 id="信息流分析"><a href="#信息流分析" class="headerlink" title="信息流分析"></a>信息流分析</h5><ul>
 <li>检查是否存在无用的语句</li>
 </ul>
-<h2 id="动态测试逻辑覆盖">动态测试(逻辑覆盖) ★★★★★</h2>
-<p>考虑如下程序：</p>
+<h2 id="动态测试-逻辑覆盖-★★★★★"><a href="#动态测试-逻辑覆盖-★★★★★" class="headerlink" title="动态测试(逻辑覆盖) ★★★★★"></a>动态测试(逻辑覆盖) ★★★★★</h2><p>考虑如下程序：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(A &gt; <span class="number">1</span> &amp;&amp; B == <span class="number">0</span>)</span><br><span class="line">	X = X/A;</span><br><span class="line"><span class="keyword">if</span>(A == <span class="number">2</span> || X &gt; <span class="number">1</span>)</span><br><span class="line">	X = X + <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
 <p>其程序流程图为：</p>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317171842004.png" alt="image-20220317171842004" style="zoom:67%;"></p>
-<h3 id="语句覆盖">语句覆盖</h3>
-<p>设计若干个设计用例，然后运行被测程序，<strong>使程序中每个可执行语句至少执行一次</strong></p>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317171842004.png" alt="image-20220317171842004" style="zoom:67%;">
+
+<h3 id="语句覆盖"><a href="#语句覆盖" class="headerlink" title="语句覆盖"></a>语句覆盖</h3><p>设计若干个设计用例，然后运行被测程序，<strong>使程序中每个可执行语句至少执行一次</strong></p>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;">
+
 <p><strong>解释</strong>：蓝色的路径覆盖了所有<strong>语句</strong>(b和d路径上没有语句)，这条测试用例则实现了100%语句覆盖</p>
-<p><strong>测试用例</strong>：A = 2，B = 0，X = 3</p>
+<p><strong>测试用例</strong>：A &#x3D; 2，B &#x3D; 0，X &#x3D; 3</p>
 <blockquote>
 <p>注意：用<strong>尽量少</strong>的设计用例覆盖所有可执行语句</p>
-<p>语句覆盖率 = 已执行 / 可执行 * 100%</p>
+<p>语句覆盖率 &#x3D; 已执行 &#x2F; 可执行 * 100%</p>
 </blockquote>
 <p><strong>优点</strong>：检查所有语句、简单易行、覆盖率高</p>
 <p><strong>缺点</strong>：以下是语句覆盖无法检测的错误</p>
 <div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="ARMASM"><figure class="iseeu highlight /armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 条件语句错误</span></span><br><span class="line">A &gt; <span class="number">1</span> &amp;&amp; <span class="keyword">B</span> == <span class="number">0</span> -&gt; A &gt; <span class="number">0</span> &amp;&amp; <span class="keyword">B</span> == <span class="number">0</span></span><br><span class="line"><span class="comment">// 逻辑运算错误</span></span><br><span class="line">A &gt; <span class="number">1</span> &amp;&amp; <span class="keyword">B</span> == <span class="number">0</span> -&gt; A &gt; <span class="number">1</span> <span class="title">||</span> <span class="keyword">B</span> == <span class="number">0</span></span><br><span class="line"><span class="comment">// 循环次数错误</span></span><br><span class="line"><span class="symbol">for</span>(int i = <span class="number">0</span><span class="comment">; i &lt; n; i++) -&gt; for(int i = 0; i &lt;= n; i++)</span></span><br></pre></td></tr></table></figure></div>
-<h3 id="分支覆盖">分支覆盖</h3>
-<p>分支覆盖又称判定覆盖，<strong>程序流程图中每条边走一遍</strong></p>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651985586292.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
+
+<h3 id="分支覆盖"><a href="#分支覆盖" class="headerlink" title="分支覆盖"></a>分支覆盖</h3><p>分支覆盖又称判定覆盖，<strong>程序流程图中每条边走一遍</strong></p>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651985586292.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;">
+
 <p><strong>解释</strong>：直观上看，就是把流程图所有能覆盖的线全部覆盖住，则分支覆盖就能达到100%</p>
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th>测试用例</th>
 <th>覆盖路径</th>
 </tr>
 </thead>
-<tbody>
-<tr class="odd">
-<td>A = 2, B = 0, X = 3</td>
+<tbody><tr>
+<td>A &#x3D; 2, B &#x3D; 0, X &#x3D; 3</td>
 <td>ace(蓝色)</td>
 </tr>
-<tr class="even">
-<td>A = 1, B = 0, X = 1</td>
+<tr>
+<td>A &#x3D; 1, B &#x3D; 0, X &#x3D; 1</td>
 <td>abd(红色)</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <blockquote>
-<p>分支覆盖率 = 已判定 / 总判定</p>
+<p>分支覆盖率 &#x3D; 已判定 &#x2F; 总判定</p>
 <p>分支覆盖的测试用例划分不止一种</p>
 <p>纠错能力比语句覆盖好一些</p>
 </blockquote>
-<h3 id="条件覆盖">条件覆盖</h3>
-<p>使得被测程序每个判断中的<strong>每个条件的可能取值至少要满足一次</strong></p>
+<h3 id="条件覆盖"><a href="#条件覆盖" class="headerlink" title="条件覆盖"></a>条件覆盖</h3><p>使得被测程序每个判断中的<strong>每个条件的可能取值至少要满足一次</strong></p>
 <div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="YAML"><figure class="iseeu highlight /yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">//</span> <span class="string">第一个条件</span></span><br><span class="line"><span class="attr">T1:</span> <span class="string">A</span> <span class="string">&gt;</span>  <span class="number">1</span>  </span><br><span class="line"><span class="attr">F1:</span> <span class="string">A</span> <span class="string">&lt;=</span> <span class="number">1</span></span><br><span class="line"><span class="attr">T2:</span> <span class="string">B</span> <span class="string">==</span> <span class="number">0</span></span><br><span class="line"><span class="attr">F2:</span> <span class="string">B</span> <span class="type">!=</span> <span class="number">0</span></span><br><span class="line"><span class="string">//</span> <span class="string">第二个条件</span></span><br><span class="line"><span class="attr">T3:</span> <span class="string">A</span> <span class="string">==</span> <span class="number">2</span></span><br><span class="line"><span class="attr">F3:</span> <span class="string">A</span> <span class="type">!=</span> <span class="number">2</span></span><br><span class="line"><span class="attr">T4:</span> <span class="string">X</span> <span class="string">&gt;</span>  <span class="number">1</span></span><br><span class="line"><span class="attr">F4:</span> <span class="string">X</span> <span class="string">&lt;=</span> <span class="number">1</span></span><br><span class="line"><span class="string">//</span> <span class="string">缺点：不能实现对每个分支的检查，用例数量增加</span></span><br></pre></td></tr></table></figure></div>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651986336995.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
+
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651986336995.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;">
+
 <p><strong>为什么需要abe？</strong></p>
 <p><strong>解释</strong>：因为仅有ace和abd的情况下，条件F2和F4没有被测试，而条件覆盖要求<strong>所有条件的正反面都要至少被测试一次</strong>。</p>
 <table>
 <thead>
-<tr class="header">
-<th style="text-align: center;">用例编号</th>
-<th style="text-align: center;">ABX</th>
-<th style="text-align: center;">路径</th>
-<th style="text-align: center;">覆盖条件</th>
+<tr>
+<th align="center">用例编号</th>
+<th align="center">ABX</th>
+<th align="center">路径</th>
+<th align="center">覆盖条件</th>
 </tr>
 </thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">203</td>
-<td style="text-align: center;">ace</td>
-<td style="text-align: center;">T1 T2 T3 T4</td>
+<tbody><tr>
+<td align="center">1</td>
+<td align="center">203</td>
+<td align="center">ace</td>
+<td align="center">T1 T2 T3 T4</td>
 </tr>
-<tr class="even">
-<td style="text-align: center;">2</td>
-<td style="text-align: center;">101</td>
-<td style="text-align: center;">abd</td>
-<td style="text-align: center;">F1 T2 F3 T4</td>
+<tr>
+<td align="center">2</td>
+<td align="center">101</td>
+<td align="center">abd</td>
+<td align="center">F1 T2 F3 T4</td>
 </tr>
-<tr class="odd">
-<td style="text-align: center;">3</td>
-<td style="text-align: center;">211</td>
-<td style="text-align: center;">abe</td>
-<td style="text-align: center;">T1 <strong>F2</strong> T3
-<strong>F4</strong></td>
+<tr>
+<td align="center">3</td>
+<td align="center">211</td>
+<td align="center">abe</td>
+<td align="center">T1 <strong>F2</strong> T3 <strong>F4</strong></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <blockquote>
 <p>条件覆盖不是分支覆盖的超集</p>
 </blockquote>
-<h3 id="分支-条件覆盖">分支-条件覆盖</h3>
-<p>顾名思义，分支覆盖 + 条件覆盖</p>
+<h3 id="分支-条件覆盖"><a href="#分支-条件覆盖" class="headerlink" title="分支-条件覆盖"></a>分支-条件覆盖</h3><p>顾名思义，分支覆盖 + 条件覆盖</p>
 <div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="ARMASM"><figure class="iseeu highlight /armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 第一个分支</span></span><br><span class="line">(<span class="number">1</span>) A &gt; <span class="number">1</span>,  <span class="keyword">B</span> == <span class="number">0</span>, 记为T1, T2</span><br><span class="line">(<span class="number">2</span>) A &gt; <span class="number">1</span>,  <span class="keyword">B</span> != <span class="number">0</span>, 记为T1, <span class="built_in">F2</span></span><br><span class="line">(<span class="number">3</span>) A &lt;= <span class="number">1</span>, <span class="keyword">B</span> == <span class="number">0</span>, 记为<span class="built_in">F1</span>, T2</span><br><span class="line">(<span class="number">4</span>) A &lt;= <span class="number">1</span>, <span class="keyword">B</span> != <span class="number">0</span>, 记为<span class="built_in">F1</span>, <span class="built_in">F2</span></span><br><span class="line"><span class="comment">// 第二个分支</span></span><br><span class="line">(<span class="number">5</span>) A == <span class="number">2</span>, X &gt;  <span class="number">1</span>, 记为T3, T4</span><br><span class="line">(<span class="number">6</span>) A == <span class="number">2</span>, X &lt;= <span class="number">1</span>, 记为T3, <span class="built_in">F4</span></span><br><span class="line">(<span class="number">7</span>) A != <span class="number">2</span>, X &gt;  <span class="number">1</span>, 记为<span class="built_in">F3</span>, T4</span><br><span class="line">(<span class="number">8</span>) A != <span class="number">2</span>, X &lt;= <span class="number">1</span>, 记为<span class="built_in">F3</span>, <span class="built_in">F4</span></span><br></pre></td></tr></table></figure></div>
+
 <p>太懒了，图略</p>
 <table>
 <thead>
-<tr class="header">
-<th style="text-align: center;">用例编号</th>
-<th style="text-align: center;">ABX</th>
-<th style="text-align: center;">覆盖组合号</th>
-<th style="text-align: center;">路径</th>
-<th style="text-align: center;">覆盖条件</th>
+<tr>
+<th align="center">用例编号</th>
+<th align="center">ABX</th>
+<th align="center">覆盖组合号</th>
+<th align="center">路径</th>
+<th align="center">覆盖条件</th>
 </tr>
 </thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">203</td>
-<td style="text-align: center;">(1)(5)</td>
-<td style="text-align: center;">ace</td>
-<td style="text-align: center;">T1 T2 T3 T4</td>
+<tbody><tr>
+<td align="center">1</td>
+<td align="center">203</td>
+<td align="center">(1)(5)</td>
+<td align="center">ace</td>
+<td align="center">T1 T2 T3 T4</td>
 </tr>
-<tr class="even">
-<td style="text-align: center;">2</td>
-<td style="text-align: center;">211</td>
-<td style="text-align: center;">(2)(6)</td>
-<td style="text-align: center;">abe</td>
-<td style="text-align: center;">T1 F2 T3 F4</td>
+<tr>
+<td align="center">2</td>
+<td align="center">211</td>
+<td align="center">(2)(6)</td>
+<td align="center">abe</td>
+<td align="center">T1 F2 T3 F4</td>
 </tr>
-<tr class="odd">
-<td style="text-align: center;">3</td>
-<td style="text-align: center;">103</td>
-<td style="text-align: center;">(3)(7)</td>
-<td style="text-align: center;">abe</td>
-<td style="text-align: center;">F1 T2 F3 T4</td>
+<tr>
+<td align="center">3</td>
+<td align="center">103</td>
+<td align="center">(3)(7)</td>
+<td align="center">abe</td>
+<td align="center">F1 T2 F3 T4</td>
 </tr>
-<tr class="even">
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">111</td>
-<td style="text-align: center;">(4)(8)</td>
-<td style="text-align: center;">abd</td>
-<td style="text-align: center;">F1 F2 F3 F4</td>
+<tr>
+<td align="center">4</td>
+<td align="center">111</td>
+<td align="center">(4)(8)</td>
+<td align="center">abd</td>
+<td align="center">F1 F2 F3 F4</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>解释：主要关注覆盖组合号和覆盖条件，要求如下：</p>
 <ul>
 <li>覆盖组合号：每条测试用例必须包含<strong>第一个分支和第二个分支的一种不同组合</strong></li>
@@ -426,114 +420,114 @@
 <blockquote>
 <p>漏掉了路径acd，并不是完备的测试</p>
 </blockquote>
-<h3 id="路径覆盖">路径覆盖：</h3>
-<p>覆盖程序中<strong>所有可能的路径</strong>(理想的测试程度)</p>
+<h3 id="路径覆盖："><a href="#路径覆盖：" class="headerlink" title="路径覆盖："></a>路径覆盖：</h3><p>覆盖程序中<strong>所有可能的路径</strong>(理想的测试程度)</p>
 <div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="XL"><figure class="iseeu highlight /xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">ace</span> -&gt;</span> L1</span><br><span class="line"><span class="function"><span class="title">abc</span> -&gt;</span> L2</span><br><span class="line"><span class="function"><span class="title">abe</span> -&gt;</span> L3</span><br><span class="line"><span class="function"><span class="title">acd</span> -&gt;</span> L4</span><br></pre></td></tr></table></figure></div>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651987244264.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
-<p><strong>解释</strong>：组合数学原理，第一个分支有两个选择，第二个分支有两个选择，故共有2
-<span class="math inline">\(\times\)</span> 2 = 4种选择</p>
+
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651987244264.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;">
+
+<p><strong>解释</strong>：组合数学原理，第一个分支有两个选择，第二个分支有两个选择，故共有2 $\times$ 2 &#x3D; 4种选择</p>
 <table>
 <thead>
-<tr class="header">
-<th style="text-align: center;">用例编号</th>
-<th style="text-align: center;">ABX</th>
-<th style="text-align: center;">覆盖路径</th>
+<tr>
+<th align="center">用例编号</th>
+<th align="center">ABX</th>
+<th align="center">覆盖路径</th>
 </tr>
 </thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">203</td>
-<td style="text-align: center;">ace(L1)</td>
+<tbody><tr>
+<td align="center">1</td>
+<td align="center">203</td>
+<td align="center">ace(L1)</td>
 </tr>
-<tr class="even">
-<td style="text-align: center;">2</td>
-<td style="text-align: center;">101</td>
-<td style="text-align: center;">abd(L2)</td>
+<tr>
+<td align="center">2</td>
+<td align="center">101</td>
+<td align="center">abd(L2)</td>
 </tr>
-<tr class="odd">
-<td style="text-align: center;">3</td>
-<td style="text-align: center;">211</td>
-<td style="text-align: center;">abe(L3)</td>
+<tr>
+<td align="center">3</td>
+<td align="center">211</td>
+<td align="center">abe(L3)</td>
 </tr>
-<tr class="even">
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">301</td>
-<td style="text-align: center;">acd(L4)</td>
+<tr>
+<td align="center">4</td>
+<td align="center">301</td>
+<td align="center">acd(L4)</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <blockquote>
 <p>路径测试虽然完备，但是当项目达到一定量级时，独立路径的数量会非常大</p>
 </blockquote>
-<h3 id="基本路径测试方法">基本路径测试方法</h3>
-<h5 id="四个步骤">四个步骤：</h5>
-<ol type="1">
-<li><p>画出程序的<strong>控制流图</strong></p></li>
+<h3 id="基本路径测试方法"><a href="#基本路径测试方法" class="headerlink" title="基本路径测试方法"></a>基本路径测试方法</h3><h5 id="四个步骤："><a href="#四个步骤：" class="headerlink" title="四个步骤："></a>四个步骤：</h5><ol>
+<li><p>画出程序的<strong>控制流图</strong></p>
+</li>
 <li><p>计算程序的<strong>环形复杂度</strong></p>
 <ul>
-<li><p>一种为程序逻辑复杂度提供<strong>定量尺度</strong>的软件度量</p></li>
-<li><p>提供程序基本集的独立路径数量</p></li>
-<li><p><strong>计算方法</strong>：<span class="math inline">\(V = E - N
-+ 2\)</span>(<span class="math inline">\(E\)</span>是控制流图中边的数量，<span class="math inline">\(N\)</span>是节点数量)</p>
-<p>​ <span class="math inline">\(V = P + 1\)</span>(<span class="math inline">\(P\)</span>是控制流图中<strong>判定节点</strong>的数量)</p></li>
-</ul></li>
+<li><p>一种为程序逻辑复杂度提供<strong>定量尺度</strong>的软件度量</p>
+</li>
+<li><p>提供程序基本集的独立路径数量</p>
+</li>
+<li><p><strong>计算方法</strong>：$V &#x3D; E - N + 2$($E$是控制流图中边的数量，$N$是节点数量)</p>
+<p>​                   $V &#x3D; P + 1$($P$是控制流图中<strong>判定节点</strong>的数量)</p>
+</li>
+</ul>
+</li>
 <li><p>导出基本路径集，<strong>确定程序的独立路径</strong></p>
 <blockquote>
 <p>独立路径：和其他的独立路径相比，<strong>至少引入一个新处理语句或一个新判断的程序通路</strong></p>
-</blockquote></li>
-<li><p>根据独立路径，<strong>设计测试用例</strong>的输入数据和预期输出</p></li>
+</blockquote>
+</li>
+<li><p>根据独立路径，<strong>设计测试用例</strong>的输入数据和预期输出</p>
+</li>
 </ol>
-<h3 id="最少测试用例数计算">最少测试用例数计算</h3>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317194219038.png" alt="image-20220317194219038" style="zoom:67%;"></p>
-<p>对于嵌套型分支结构，若有<span class="math inline">\(n\)</span>个判定语句，需要<span class="math inline">\(n+1\)</span>个测试用例</p>
-<p>对于连锁型分支结构，若有<span class="math inline">\(n\)</span>个判定语句，需要有<span class="math inline">\(n*m\)</span>个测试用例</p>
-<h4 id="例子">例子</h4>
-<blockquote>
+<h3 id="最少测试用例数计算"><a href="#最少测试用例数计算" class="headerlink" title="最少测试用例数计算"></a>最少测试用例数计算</h3><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317194219038.png" alt="image-20220317194219038" style="zoom:67%;">
+
+<p>对于嵌套型分支结构，若有$n$个判定语句，需要$n+1$个测试用例</p>
+<p>对于连锁型分支结构，若有$n$个判定语句，需要有$n*m$个测试用例</p>
+<h4 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h4><blockquote>
 <p>计算该程序的最少测试用例数</p>
 </blockquote>
-<figure>
-<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508141945220.png" alt="image-20220508141945220">
-<figcaption aria-hidden="true">image-20220508141945220</figcaption>
-</figure>
+<p><img src="/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508141945220.png" alt="image-20220508141945220"></p>
 <blockquote>
-<p>将程序分解，可分为4个大的连锁分支结构</p>
+<p> 将程序分解，可分为4个大的连锁分支结构</p>
 </blockquote>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142428384.png" alt="image-20220508142428384" style="zoom:80%;"></p>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142428384.png" alt="image-20220508142428384" style="zoom:80%;">
+
 <ul>
-<li><strong>1</strong>：<span class="math inline">\(n\)</span> + 1 = 1 +
-1 = 2</li>
+<li><strong>1</strong>：$n$ + 1 &#x3D; 1 + 1 &#x3D; 2</li>
 </ul>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142455731.png" alt="image-20220508142455731" style="zoom:80%;"></p>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142455731.png" alt="image-20220508142455731" style="zoom:80%;">
+
 <ul>
 <li><p><strong>2 - 8</strong>：可以分为2和3 - 8</p>
 <ul>
 <li><p>这里可以将3 - 8分解为两个连锁分支结构，其中</p>
 <ul>
-<li><p>3 - 6：<span class="math inline">\(n\)</span> + 1 = 4 + 1 =
-5</p></li>
-<li><p>7 - 8：<span class="math inline">\(n\)</span> + 1 = 2 + 1 =
-3</p></li>
-<li><p>故3 - 8的总用例数为3 <span class="math inline">\(\times\)</span>
-5 = 15</p></li>
-</ul></li>
-<li><p>2 - 8：<span class="math inline">\(n\)</span> + 1 = 15 + 1 =
-16</p></li>
-</ul></li>
+<li><p>3 - 6：$n$ + 1 &#x3D; 4 + 1 &#x3D; 5</p>
+</li>
+<li><p>7 - 8：$n$ + 1 &#x3D; 2 + 1 &#x3D; 3</p>
+</li>
+<li><p>故3 - 8的总用例数为3 $\times$ 5 &#x3D; 15</p>
+</li>
 </ul>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142505675.png" alt="image-20220508142505675" style="zoom:80%;"></p>
-<ul>
-<li><strong>9 - 10</strong>：<span class="math inline">\(n\)</span> + 1
-= 2 + 1 = 3</li>
+</li>
+<li><p>2 - 8：$n$ + 1 &#x3D; 15 + 1 &#x3D; 16</p>
+</li>
 </ul>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142513887.png" alt="image-20220508142513887" style="zoom:80%;"></p>
+</li>
+</ul>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142505675.png" alt="image-20220508142505675" style="zoom:80%;">
+
 <ul>
-<li><strong>11 - 12</strong>：<span class="math inline">\(n\)</span> + 1
-= 2 + 1 = 3</li>
+<li><strong>9 - 10</strong>：$n$ + 1 &#x3D; 2 + 1 &#x3D; 3</li>
+</ul>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142513887.png" alt="image-20220508142513887" style="zoom:80%;">
+
+<ul>
+<li><strong>11 - 12</strong>：$n$ + 1 &#x3D; 2 + 1 &#x3D; 3</li>
 </ul>
 <blockquote>
-<p>故总测试用例数 = 2 <span class="math inline">\(\times\)</span> 16
-<span class="math inline">\(\times\)</span> 3 <span class="math inline">\(\times\)</span> 3 = 288</p>
+<p>故总测试用例数 &#x3D; 2 $\times$ 16 $\times$ 3 $\times$ 3 &#x3D; 288</p>
 </blockquote>
 
     </div>
@@ -618,8 +612,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95"><span class="nav-number">1.</span> <span class="nav-text">白盒测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E6%B5%8B%E8%AF%95%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">静态测试(程序结构分析)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E8%B5%B0%E6%9F%A5%E4%B8%80%E7%BB%84%E7%A8%8B%E5%BA%8F-%E9%94%99%E8%AF%AF%E6%A3%80%E6%9F%A5%E6%8A%80%E6%9C%AF"><span class="nav-number">2.0.0.1.</span> <span class="nav-text">代码走查：一组程序 +
-错误检查技术</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%A1%E6%9F%A5"><span class="nav-number">2.0.0.2.</span> <span class="nav-text">代码审查</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E6%B5%81%E5%88%86%E6%9E%90%E6%A3%80%E6%9F%A5%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%8E%A7%E5%88%B6%E7%BB%93%E6%9E%84"><span class="nav-number">2.0.0.3.</span> <span class="nav-text">控制流分析：检查程序的控制结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E5%88%86%E6%9E%90%E7%A8%8B%E5%BA%8F%E9%94%99%E8%AF%AF"><span class="nav-number">2.0.0.4.</span> <span class="nav-text">数据流分析(程序错误)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%B5%81%E5%88%86%E6%9E%90"><span class="nav-number">2.0.0.5.</span> <span class="nav-text">信息流分析</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E6%B5%8B%E8%AF%95%E9%80%BB%E8%BE%91%E8%A6%86%E7%9B%96"><span class="nav-number">3.</span> <span class="nav-text">动态测试(逻辑覆盖) ★★★★★</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E5%8F%A5%E8%A6%86%E7%9B%96"><span class="nav-number">3.1.</span> <span class="nav-text">语句覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%94%AF%E8%A6%86%E7%9B%96"><span class="nav-number">3.2.</span> <span class="nav-text">分支覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E8%A6%86%E7%9B%96"><span class="nav-number">3.3.</span> <span class="nav-text">条件覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%94%AF-%E6%9D%A1%E4%BB%B6%E8%A6%86%E7%9B%96"><span class="nav-number">3.4.</span> <span class="nav-text">分支-条件覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E5%BE%84%E8%A6%86%E7%9B%96"><span class="nav-number">3.5.</span> <span class="nav-text">路径覆盖：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%B7%AF%E5%BE%84%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95"><span class="nav-number">3.6.</span> <span class="nav-text">基本路径测试方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9B%9B%E4%B8%AA%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.6.0.1.</span> <span class="nav-text">四个步骤：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%B0%91%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E6%95%B0%E8%AE%A1%E7%AE%97"><span class="nav-number">3.7.</span> <span class="nav-text">最少测试用例数计算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">3.7.1.</span> <span class="nav-text">例子</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95"><span class="nav-number">1.</span> <span class="nav-text">白盒测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E6%B5%8B%E8%AF%95-%E7%A8%8B%E5%BA%8F%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">静态测试(程序结构分析)</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E8%B5%B0%E6%9F%A5%EF%BC%9A%E4%B8%80%E7%BB%84%E7%A8%8B%E5%BA%8F-%E9%94%99%E8%AF%AF%E6%A3%80%E6%9F%A5%E6%8A%80%E6%9C%AF"><span class="nav-number">2.0.0.1.</span> <span class="nav-text">代码走查：一组程序 + 错误检查技术</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%A1%E6%9F%A5"><span class="nav-number">2.0.0.2.</span> <span class="nav-text">代码审查</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E6%B5%81%E5%88%86%E6%9E%90%EF%BC%9A%E6%A3%80%E6%9F%A5%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%8E%A7%E5%88%B6%E7%BB%93%E6%9E%84"><span class="nav-number">2.0.0.3.</span> <span class="nav-text">控制流分析：检查程序的控制结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E5%88%86%E6%9E%90-%E7%A8%8B%E5%BA%8F%E9%94%99%E8%AF%AF"><span class="nav-number">2.0.0.4.</span> <span class="nav-text">数据流分析(程序错误)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%B5%81%E5%88%86%E6%9E%90"><span class="nav-number">2.0.0.5.</span> <span class="nav-text">信息流分析</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E6%B5%8B%E8%AF%95-%E9%80%BB%E8%BE%91%E8%A6%86%E7%9B%96-%E2%98%85%E2%98%85%E2%98%85%E2%98%85%E2%98%85"><span class="nav-number">3.</span> <span class="nav-text">动态测试(逻辑覆盖) ★★★★★</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E5%8F%A5%E8%A6%86%E7%9B%96"><span class="nav-number">3.1.</span> <span class="nav-text">语句覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%94%AF%E8%A6%86%E7%9B%96"><span class="nav-number">3.2.</span> <span class="nav-text">分支覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E8%A6%86%E7%9B%96"><span class="nav-number">3.3.</span> <span class="nav-text">条件覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%94%AF-%E6%9D%A1%E4%BB%B6%E8%A6%86%E7%9B%96"><span class="nav-number">3.4.</span> <span class="nav-text">分支-条件覆盖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E5%BE%84%E8%A6%86%E7%9B%96%EF%BC%9A"><span class="nav-number">3.5.</span> <span class="nav-text">路径覆盖：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%B7%AF%E5%BE%84%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95"><span class="nav-number">3.6.</span> <span class="nav-text">基本路径测试方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9B%9B%E4%B8%AA%E6%AD%A5%E9%AA%A4%EF%BC%9A"><span class="nav-number">3.6.0.1.</span> <span class="nav-text">四个步骤：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%B0%91%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E6%95%B0%E8%AE%A1%E7%AE%97"><span class="nav-number">3.7.</span> <span class="nav-text">最少测试用例数计算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">3.7.1.</span> <span class="nav-text">例子</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

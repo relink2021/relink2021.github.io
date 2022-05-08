@@ -380,6 +380,325 @@ Factory：抽象工厂模式</h4>
       </tags>
   </entry>
   <entry>
+    <title>LoadRunner的基本使用</title>
+    <url>/2022/05/06/LoadRunner/</url>
+    <content><![CDATA[<h3 id="性能测试">性能测试</h3>
+<hr>
+<h4 id="基本概念">基本概念</h4>
+<h5 id="什么是性能测试">什么是性能测试？</h5>
+<p>性能测试是针对软件的性能进行的测试，即测试软件运行时的<strong>时间和资源占用率</strong></p>
+<h5 id="如何进行性能测试">如何进行性能测试？</h5>
+<p>通过自动化测试工具模拟用户来测试系统<strong>能否承载用户多并发，系统是否稳定，响应时间是否达到期望。</strong></p>
+<h5 id="性能测试的目的">性能测试的目的？</h5>
+<ol type="1">
+<li>评估当前系统的能力，通过测试得到系统整体的评估。</li>
+<li>寻找性能瓶颈，优化性能</li>
+<li>预测未来性能</li>
+</ol>
+<h5 id="性能测试的注意事项">性能测试的注意事项？</h5>
+<ol type="1">
+<li>性能测试需要独立的测试环境(网络和硬件环境)<br>
+</li>
+<li>需要定义测试目标(成本高)</li>
+<li>尽早执行</li>
+</ol>
+<hr>
+<h4 id="性能测试的分类">性能测试的分类</h4>
+<h5 id="基准测试">基准测试</h5>
+<p>在一定的测试环境下，模拟<strong>单用户</strong>访问请求一种或多种业务为，<strong>产出基准性能参数</strong>，为多用户并发测试和综合测试<strong>提供参考依据</strong></p>
+<p><strong>并发测试</strong></p>
+<p>模拟多<strong>用户同时访问</strong>同一应用、模块或数据，观察是否存在问题</p>
+<p><strong>负载测试</strong></p>
+<p>对被测系统<strong>不断加压</strong>，直到超过预定指标或资源达到饱和状态不能加压为止</p>
+<p><strong>压力测试</strong></p>
+<p>系统已经<strong>达到一定饱和程度(CPU、磁盘)的情况下，系统能够处理业务的能力</strong></p>
+<p><strong>稳定性测试</strong></p>
+<p>给系统加载<strong>一定业务压力</strong>的情况下，<strong>使系统运行一周</strong>，检测系统是否稳定</p>
+<h5 id="配置测试">配置测试</h5>
+<p>通过<strong>软硬件配置</strong>调整，了解不同配置对系统性能影响的程度，从而<strong>找到最优配置</strong></p>
+<hr>
+<h4 id="性能测试指标">性能测试指标</h4>
+<h5 id="系统指标1响应时间">系统指标1：响应时间</h5>
+<p>从用户<strong>发送一个请求</strong>到用户<strong>接收到服务器返回的响应数据</strong>的时间
+= 网络传输时间 + 应用处理时间</p>
+<h5 id="系统指标2并发数">系统指标2：并发数</h5>
+<ol type="1">
+<li>并发用户数：某个物理<strong>时刻</strong>同时向系统<strong>提交请求的用户数</strong></li>
+<li>在线用户数：某段时间<strong>访问系统的用户数</strong>，不一定向系统提交请求</li>
+<li>系统用户数：系统注册的<strong>总用户</strong></li>
+</ol>
+<h5 id="系统指标3tps每秒事务数">系统指标3：TPS(每秒事务数)</h5>
+<p><strong>单位时间</strong>内系统处理客户端请求的事务次数</p>
+<p><strong>计算方法：</strong>TPS = 并发数/平均响应时间</p>
+<p><img src="/2022/05/06/LoadRunner/Screenshot_2022-05-06-09-19-57-07_149003a2d400f6a-1651800152876.jpg" alt="Screenshot_2022-05-06-09-19-57-07_149003a2d400f6a" style="zoom: 50%;"></p>
+<h5 id="资源指标资源利用率">资源指标：资源利用率</h5>
+<p>不同系统资源的使用程度，通常用<strong>占用的最大百分比</strong>衡量</p>
+<p><strong>服务器资源指标</strong>：</p>
+<ol type="1">
+<li>CPU使用率(85%)</li>
+<li>内存利用率(85%)</li>
+<li>磁盘I/O</li>
+<li>网络带宽(100Mb/8 = 12.5MB)</li>
+</ol>
+<hr>
+<h3 id="性能测试流程">性能测试流程</h3>
+<h5 id="宏观流程">宏观流程</h5>
+<p>需求分析 <span class="math inline">\(\rightarrow\)</span>
+编写测试计划和方案 <span class="math inline">\(\rightarrow\)</span>
+测试执行 <span class="math inline">\(\rightarrow\)</span> 结果分析</p>
+<h5 id="需求分析">需求分析</h5>
+<p>需求分析是性能测试的基础，直接影响性能测试的结果，需要明确：</p>
+<ol type="1">
+<li><strong>被测系统</strong>：系统架构、开发语言、运行环境</li>
+<li><strong>测试内容</strong>：需要测试的业务</li>
+<li><strong>测试策略</strong>：基准测试、压力测试、负载测试、稳定性测试等</li>
+<li><strong>测试指标</strong>：并发用户数、响应时间、CPU使用率等等</li>
+</ol>
+<blockquote>
+<p>例子：某电商要求每天完成交易额2亿元</p>
+<p>根据28定律，80%的用户请求集中在20%的热点时间段，以每单300元计算</p>
+<p>每日交易数 = 200000000/300 = 666666.66666</p>
+<p>每小时交易数 = 666666 * 0.8 / (24 * 0.2) = 111111</p>
+<p><strong>TPS = 111111 / 3600 = 30.86</strong></p>
+</blockquote>
+<h5 id="测试计划和测试方案">测试计划和测试方案</h5>
+<p>测试计划需要明确以下几点：</p>
+<ol type="1">
+<li><p><strong>测试目标</strong>：某些具体业务(登录、支付等)</p></li>
+<li><p><strong>人力资源</strong>：明确性能测试时间、计划测试的参与人数</p></li>
+<li><p><strong>时间进度</strong>：制定时间进度表，如下图</p>
+<table>
+<thead>
+<tr class="header">
+<th>性能测试</th>
+<th>工作日</th>
+<th>开始时间</th>
+<th>结束时间</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>测试用例设计</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>测试环境搭建</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>测试数据准备</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>脚本开发及执行</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>测试结果分析</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>风险评估</strong>：列出可能存在的风险(本地和实际机器测试环境的区别等)</p></li>
+</ol>
+<p>测试方案和测试计划存在一些区别：</p>
+<ol type="1">
+<li><strong>测试环境</strong>：架构设计、软硬件配置(服务器、数据库)</li>
+<li><strong>测试工具</strong>：性能测试工具(LoadRunner、Jmeter等)、监控工具(Linux的nmon等)</li>
+<li><strong>测试策略</strong>：单一场景(登录/下单)、混合场景(登录后查看商品然后下单)、稳定性测试</li>
+</ol>
+<blockquote>
+<p>测试环境应尽可能与生产环境一致！</p>
+</blockquote>
+<h5 id="测试用例设计及执行">测试用例设计及执行</h5>
+<p>测试<strong>性能点</strong>：登录、注册</p>
+<p><strong>用例编写</strong></p>
+<ol type="1">
+<li><p>预期性能指标用例如下：</p>
+<table>
+<thead>
+<tr class="header">
+<th>用例编号</th>
+<th>用例目的</th>
+<th>测试数据</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>登录-001</td>
+<td>测试100个虚拟用户并发时，系统登录的响应时间</td>
+<td>3000</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th>操作步骤（该表格可以省略）</th>
+<th>期望的性能</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="even">
+<td>点击Login登录</td>
+<td>&lt;1s</td>
+</tr>
+<tr class="odd">
+<td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong>单业务并发性能</strong></p></li>
+<li><p><strong>混合场景并发性能</strong></p></li>
+</ol>
+<p><strong>用例执行</strong></p>
+<ol type="1">
+<li><strong>脚本编写</strong>：根据测试用例编写对应脚本</li>
+<li><strong>场景监控设计</strong>：将编写好的脚本设计执行(执行次数、执行时间)</li>
+<li><strong>生成测试报告</strong>：表格、图标、性能评估</li>
+</ol>
+<hr>
+<h3 id="loadrunner">LoadRunner</h3>
+<p>LoadRunner是一种功能强大的负载测试工具，通过模拟大量的虚拟测试用户对系统进行性能测试</p>
+<blockquote>
+<p>安装教程：<a href="https://www.cnblogs.com/echo-hui/p/9969475.html">LoadRunner11的安装、破解和汉化</a></p>
+<p>LoadRunner12支持IE9+浏览器，但是没有好的破解方法，LoadRunner11仅支持IE8，建议在Win7使用</p>
+</blockquote>
+<h4 id="loadrunner的基本组成重点">LoadRunner的基本组成(重点)</h4>
+<p>LoadRunner由4部分组成，分别是Virtual user generator、Controller、Load
+Generator和Analysis</p>
+<ul>
+<li>用户脚本(Virtual user generator)
+<ul>
+<li>简称VuGen</li>
+<li>录制与编写脚本的地方，通过录制或编写脚本模拟用户的行为，同时打印出日志信息方便调试</li>
+<li>VuGen也是一个IDE，在这里完成脚本开发并调试通过后就可以放到Controller中创建场景</li>
+</ul></li>
+<li>控制台(Controller)
+<ul>
+<li>是性能测试场景设计以及监控的地方，用于设计场景</li>
+<li>Controller本身无法形成负载，它只是一个设计工具</li>
+</ul></li>
+<li>负载生成器(Load Generator)
+<ul>
+<li>负责将VuGen脚本复制成大量虚拟用户对系统生成负载</li>
+<li>生成的负载一般数量较大，通过一台Controller调用多台Generator</li>
+</ul></li>
+<li>结果分析器(Analysis)
+<ul>
+<li>收集测试数据后生成图标报告，便于对相关数据进行整理分析</li>
+</ul></li>
+</ul>
+<blockquote>
+<p>注意：在LoadRunner中，Controller和Load
+Generator都在放在Controller中，通过Controller调用Load Generator</p>
+</blockquote>
+<h5 id="loadrunner自带的测试环境">LoadRunner自带的测试环境</h5>
+<p>启动程序：HP LoadRunner <span class="math inline">\(\rightarrow\)</span> Start Web Server</p>
+<p>登录前端：HP LoadRunner <span class="math inline">\(\rightarrow\)</span> HP Web Tours Application</p>
+<ul>
+<li>username: jojo</li>
+<li>password: bean</li>
+</ul>
+<h5 id="virtual-user-generator">Virtual User Generator</h5>
+<ul>
+<li>Virtual User
+Generator是一种基于<strong>录制回放</strong>的工具，可以把操作步骤录制下来，自动转化为脚本</li>
+<li>在VuGen中录制得到的用户行为就是虚拟了一个用户的行为，称为Vuser，脚本称为Vuser
+Script</li>
+<li>VuGen进行用户行为模拟的流程</li>
+</ul>
+<h4 id="脚本录制">脚本录制</h4>
+<h5 id="协议探测器">协议探测器</h5>
+<p>错误的协议会导致Virtual User
+Generator录制不到脚本、或录制的脚本不完整</p>
+<p><strong>启动：</strong></p>
+<p><img src="/2022/05/06/LoadRunner/image-20220506133720734.png" alt="image-20220506133720734" style="zoom:80%;"></p>
+<h5 id="如何录制脚本">如何录制脚本</h5>
+<p><strong>录制前准备</strong></p>
+<ol type="1">
+<li>启动测试环境</li>
+<li>确定被测系统类型：可以通过探测器获取</li>
+<li>录制采用的浏览器IE8</li>
+<li>被测服务器地址</li>
+</ol>
+<p><strong>录制脚本</strong></p>
+<blockquote>
+<p>实现登录-退出操作</p>
+</blockquote>
+<p><strong>录制模式</strong></p>
+<ol type="1">
+<li><p><strong>HTML-base script</strong></p>
+<p>一个<strong>页面</strong>录制一条语句(推荐浏览器项目)，更加简洁</p></li>
+<li><p><strong>URL-based script</strong></p>
+<p>一条客户端发起的<strong>请求</strong>录制一条语句(推荐非浏览器项目)，更加详细</p></li>
+</ol>
+<h5 id="脚本的组成及函数">脚本的组成及函数</h5>
+<p><strong>Vugen脚本的组成</strong></p>
+<ul>
+<li>vuser_init：虚拟用户初始化，运行一次</li>
+<li>action：具体操作，可迭代</li>
+<li>vuser_end：结束操作，运行一次</li>
+</ul>
+<p><strong>函数</strong></p>
+<p>脚本模式下，每行脚本都是函数</p>
+<ul>
+<li>web_url：直接请求一个网页</li>
+<li>web_submit_data：用来生成表单的GET或POST请求</li>
+<li>web_image：通过单击图片链接请求打开一个网页</li>
+</ul>
+<h5 id="脚本回放">脚本回放</h5>
+<ul>
+<li>运行脚本：
+<ul>
+<li>点击运行图标或F5运行</li>
+</ul></li>
+<li>查看结果：包含录制、回话、关联等相关信息的输出管理
+<ul>
+<li><strong>Repay
+Log(回放日志)</strong>：脚本回放时记录的日志，可通过设置显示更多内容</li>
+<li>Recording
+Log(录制日志)：录制脚本时产生的日志，C/S通信的交互信息</li>
+<li>Correlation
+Results(关联结果)：脚本需要关联时，回放脚本的过程中记录的需要关联的值</li>
+<li>Generation Log(生成日志)：脚本生成时产生的日志</li>
+</ul></li>
+</ul>
+<p><img src="/2022/05/06/LoadRunner/image-20220507135042864.png" alt="image-20220507135042864" style="zoom:80%;"></p>
+<h5 id="运行时设置run-time-settings">运行时设置(Run-time Settings)</h5>
+<ul>
+<li><p><strong>run logic(运行逻辑)</strong></p>
+<ul>
+<li><p>设置(Action的)迭代次数</p></li>
+<li><p>可以添加其他Action(迭代次数影响所有Action)</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 迭代次数设置为三次</span></span><br><span class="line"><span class="built_in">vuser_init</span>();</span><br><span class="line"><span class="built_in">Action</span>();</span><br><span class="line"><span class="built_in">Action</span>();</span><br><span class="line"><span class="built_in">Action</span>();</span><br><span class="line"><span class="built_in">vuser_end</span>();</span><br></pre></td></tr></table></figure></li>
+</ul></li>
+<li><p><strong>Pacing(等待时间)</strong></p>
+<ul>
+<li>设置每次迭代之间的等待时间</li>
+</ul></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>软件测试</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2022/04/29/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very
@@ -975,20 +1294,101 @@ c，a、b和c均在1—100之间，a、b和c任意2个加起来大于第三个�
 <li>将得到的<u>因果图转换为判定表</u></li>
 <li>为判定表中的每一列所表示的情况<u>设计一个测试用例</u></li>
 </ol>
-<p>四个组成部分：</p>
+<h3 id="判定表">判定表</h3>
+<h5 id="四个组成部分">四个组成部分：</h5>
 <ol type="1">
-<li>条件桩：列出问题的所有条件</li>
-<li>条件项：针对条件桩给出的条件列出所有可能的取值</li>
-<li>动作桩：列出问题规定的可能采取的操作</li>
-<li>动作项：指出在条件项的各组取值情况下应采取的动作</li>
+<li><p><strong>条件桩</strong>：列出问题的所有条件</p></li>
+<li><p><strong>条件项</strong>：针对条件桩给出的条件列出所有可能的取值</p></li>
+<li><p><strong>动作桩</strong>：列出问题规定的可能采取的操作</p></li>
+<li><p><strong>动作项</strong>：指出在条件项的各组取值情况下应采取的动作</p>
+<table>
+<thead>
+<tr class="header">
+<th><strong>条件桩</strong></th>
+<th><strong>条件项</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>动作桩</strong></td>
+<td><strong>动作项</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>贯穿条件项和动作项的一列就是<strong>一条规则</strong>，下面是例子：</p>
+</blockquote>
+<p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508113729297.png" alt="image-20220508113729297" style="zoom:80%;"></p></li>
 </ol>
-<p>案例：<strong>第一列</strong>字符必须是<strong>#或</strong>*，<strong>第二列</strong>字符必须是<strong>一个数字</strong>，在此情况下进行文件的修改。但如果第一列字符不正确，则给出<strong>信息L</strong>；如果第二列字符不是数字，则给出<strong>信息M</strong>。</p>
+<h3 id="因果图">因果图</h3>
+<h5 id="种因果关系符号">4种因果关系符号</h5>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">符号</th>
+<th style="text-align: center;">意义(0和1代表False和True)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">恒等</td>
+<td style="text-align: center;"><code>c1 === e1;</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">非</td>
+<td style="text-align: center;"><code>if(c1 == 1) e1 = 0; else e1 = 1;</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">或</td>
+<td style="text-align: center;"><code>if(c1 || c2 || c3 == 1) e1 = 1; else e1 = 0</code>;</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">与</td>
+<td style="text-align: center;"><code>if(c1 &amp;&amp; c2 == 2) e1 = 1; else e1 = 0;</code></td>
+</tr>
+</tbody>
+</table>
+<p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508114644203.png" alt="image-20220508114644203" style="zoom:80%;"></p>
+<h5 id="种因果图约束">5种因果图约束</h5>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">约束</th>
+<th style="text-align: center;">意义(0和1代表False和True)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">异</td>
+<td style="text-align: center;">不能同时等于1</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">或</td>
+<td style="text-align: center;">不能同时等于0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">唯一</td>
+<td style="text-align: center;">有且只有一个等于1</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">要求</td>
+<td style="text-align: center;">输入a是1时，b也必须是1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">强制</td>
+<td style="text-align: center;">结果a为1，b强制为0</td>
+</tr>
+</tbody>
+</table>
+<p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508115125679.png" alt="image-20220508115125679" style="zoom:67%;"></p>
+<h5 id="案例">案例</h5>
+<p><strong>第一列</strong>字符必须是<strong>#或</strong>*，<strong>第二列</strong>字符必须是<strong>一个数字</strong>，在此情况下进行文件的修改。但如果第一列字符不正确，则给出<strong>信息L</strong>；如果第二列字符不是数字，则给出<strong>信息M</strong>。</p>
 <p>解题步骤：</p>
 <ol type="1">
-<li>分析程序的规格说明，列出原因和结果。</li>
-<li>找出原因与结果之间的因果关系、原因与原因之间的约束关系，画出因果图。</li>
-<li>将因果图转换成决策表。</li>
-<li>根据(3)中的决策表，设计测试用例的输入数据和预期输出。</li>
+<li>分析程序的规格说明，<strong>列出原因和结果</strong>。</li>
+<li>找出原因与结果之间的因果关系、原因与原因之间的约束关系，<strong>画出因果图</strong>。</li>
+<li><strong>将因果图转换成决策表</strong>。</li>
+<li>根据(3)中的决策表，<strong>设计测试用例</strong>的输入数据和预期输出。</li>
 </ol>
 <p>原因：</p>
 <ul>
@@ -1003,9 +1403,9 @@ c，a、b和c均在1—100之间，a、b和c任意2个加起来大于第三个�
 <li>e2：修改文件</li>
 <li>e3：给出信息M</li>
 </ul>
-<p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20220402195652141.png" alt="image-20220402195652141" style="zoom: 67%;"></p>
-<p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20220402202425632.png" alt="image-20220402202425632" style="zoom: 67%;"></p>
-<p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20220402202454567.png" alt="image-20220402202454567" style="zoom:67%;"></p>
+<p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508120326033.png" alt="image-20220508120326033" style="zoom:80%;"></p>
+<p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508120344332.png" alt="image-20220508120344332" style="zoom:80%;"></p>
+<p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508120355562.png" alt="image-20220508120355562" style="zoom:80%;"></p>
 ]]></content>
       <tags>
         <tag>软件测试</tag>

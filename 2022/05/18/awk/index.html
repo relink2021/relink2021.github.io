@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1. 简介 awk是一门编程语言，主要应用领域为数据过滤、统计和计算，在系统中通常用来处理日志数据。 使用命令 man awk 查看awk的详细信息 2. 执行过程 2.1 示例代码 123456# BEGIN&amp;#123;print &quot;name&quot;&amp;#125; 打印&amp;#x27;name&amp;#x27;字符串# &amp;#123;print $2&amp;#125; 打印每一行的第二列，前">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux三剑客之awk">
+<meta property="og:url" content="http://example.com/2022/05/18/awk/index.html">
+<meta property="og:site_name" content="Relink">
+<meta property="og:description" content="1. 简介 awk是一门编程语言，主要应用领域为数据过滤、统计和计算，在系统中通常用来处理日志数据。 使用命令 man awk 查看awk的详细信息 2. 执行过程 2.1 示例代码 123456# BEGIN&amp;#123;print &quot;name&quot;&amp;#125; 打印&amp;#x27;name&amp;#x27;字符串# &amp;#123;print $2&amp;#125; 打印每一行的第二列，前">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-18T01:03:33.000Z">
+<meta property="article:modified_time" content="2022-05-18T04:40:04.151Z">
+<meta property="article:author" content="HWH">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/05/18/awk/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux三剑客之awk | Relink</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Relink</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/18/awk/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="HWH">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Relink">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux三剑客之awk
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-05-18 09:03:33 / 修改时间：12:40:04" itemprop="dateCreated datePublished" datetime="2022-05-18T09:03:33+08:00">2022-05-18</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="简介">1. 简介</h3>
+<p>awk是一门<strong>编程语言</strong>，主要应用领域为数据<strong>过滤、统计和计算</strong>，在系统中通常用来处理日志数据。</p>
+<p>使用命令 <code>man awk</code> 查看awk的详细信息</p>
+<h3 id="执行过程">2. 执行过程</h3>
+<h4 id="示例代码">2.1 示例代码</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">BEGIN&#123;<span class="built_in">print</span> <span class="string">&quot;name&quot;</span>&#125; 打印<span class="string">&#x27;name&#x27;</span>字符串</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">&#123;<span class="built_in">print</span> <span class="variable">$2</span>&#125; 打印每一行的第二列，前面可以加上条件</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">END&#123;<span class="built_in">print</span> <span class="string">&quot;end of file&quot;</span>&#125; 打印EOF</span></span><br><span class="line">awk -F, &#x27;BEGIN&#123;print &quot;name&quot;&#125;&#123;print $2&#125;END&#123;print &quot;end of file&quot;&#125;&#x27; test.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">带条件的awk命令，指定打印第二行第二列内容</span></span><br><span class="line">awk -F, &#x27;BEGIN&#123;print &quot;name&quot;&#125;NR==2&#123;print $2&#125;END&#123;print &quot;end of file&quot;&#125;&#x27; test.txt</span><br></pre></td></tr></table></figure></div>
+<h4 id="流程">2.2 流程</h4>
+<p><strong>读取文件之前</strong>：进行命令行赋值或设置命令行参数，并运行BEGIN{}方法体</p>
+<p><strong>读取文件过程</strong>：读取文件内容 <span class="math inline">\(\rightarrow\)</span> 判断是否满足结束条件 <span class="math inline">\(\rightarrow\)</span> 不满足则继续读取下一行 <span class="math inline">\(\rightarrow\)</span> EOF</p>
+<p><strong>读取文件之后</strong>：运行END{}方法体</p>
+<h3 id="常用操作">3. 常用操作</h3>
+<h4 id="行和列">3.1 行和列</h4>
+<p><strong>行</strong>：在awk中称为记录(record)，每一行默认通过回车分割</p>
+<p><strong>列</strong>：在awk中称为字段/域(field)，每一列默认通过空格分割</p>
+<blockquote>
+<p>awk中的行列结束标记都可以修改</p>
+</blockquote>
+<h5 id="取行">3.1.1 取行</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">NR：行号</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">符号包括 &gt; &lt; &lt;= &gt;= == !=</span></span><br><span class="line">NR == 1 # 取出第一行</span><br><span class="line">NR &gt;= 1 &amp;&amp; NR &lt;= 5 # 取出1~5行</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">直接索引</span></span><br><span class="line">awk &#x27;/kjournald/&#x27; test.txt # 取出所有带有&#x27;kjournald&#x27;记录</span><br></pre></td></tr></table></figure></div>
+<h5 id="取列">3.1.2 取列</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-F 指定分隔符(默认为空格/连续的空格/tab键)</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="variable">$1</span> 取出第1列</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="variable">$0</span> 表示整行的内容</span></span><br><span class="line">awk &#x27;&#123;print $6&#125;&#x27; test.txt # 取出第6列的全部内容</span><br><span class="line">awk NR==2&#x27;&#123;print $0&#125;&#x27; test.txt # 取出第2行的全部内容</span><br><span class="line">awk &#x27;&#123;print $1,$2&#125;&#x27; test.txt # 取出第1列和第2列的全部内容</span><br><span class="line">awk &#x27;&#123;print $1,$3,$5&#125;&#x27; test.txt |column -t # 取出第1,3,5列的全部内容，并进行对齐</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">NF：每行有多少字段</span></span><br><span class="line">awk &#x27;&#123;print $NF&#125;&#x27; test.txt # 取最后一列</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">结果间可以自定义分隔符</span></span><br><span class="line">awk &#x27;&#123;print $1 &quot;@&quot; $3&#125;&#x27; test.txt # 取出第1,3列，并以@分割</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">OFS: OutPut Field Separator，输出时的分隔符，默认为空格</span></span><br><span class="line">awk -F: -vOFS=: &#x27;&#123;print $NF,$2,$3,$4,$5,$6,$1&#125;&#x27; test.txt # 输出时默认以:分割</span><br></pre></td></tr></table></figure></div>
+<h4 id="awk模式匹配">3.2 awk模式匹配</h4>
+<p>了解awk的条件有哪些情况：</p>
+<ul>
+<li>比较符号： &gt; &lt; &gt;= &lt;= == !=</li>
+<li>正则表达式</li>
+<li>范围表达式</li>
+<li>特殊条件：BEGIN{} END{}</li>
+</ul>
+<h5 id="比较表达式">3.2.1 比较表达式</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">awk &#x27;NR&gt;=1 &amp;&amp; NR &lt;=3&#x27; test.txt</span><br></pre></td></tr></table></figure></div>
+<h5 id="正则">3.2.2 正则</h5>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">正则</th>
+<th style="text-align: center;">awk正则</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">^ 表示以...开头的行</td>
+<td style="text-align: center;">某一列的开头</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">$ 表示以...结尾的行</td>
+<td style="text-align: center;">某一列的结尾</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">^$表示空行</td>
+<td style="text-align: center;">某一列的空(少用)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>支持扩展正则</li>
+<li>awk的正则可以精确到行，指定包含或不包含指定内容</li>
+<li>~包含</li>
+<li>!~不包含</li>
+</ul>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出第3列以1开头的行</span></span><br><span class="line">awk -F: &#x27;$3~/^1/&#x27; /etc/passwd</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找到第3列以2开头的行，并显示第1列，第3列和最后一列</span></span><br><span class="line">awk -F: &#x27;$3~/^2/&#123;print $1,$3,$NF&#125;&#x27; /etc/passwd</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找到第3列以1或2开头的行</span></span><br><span class="line">awk -F: &#x27;$3~/^[12]/&#123;print $1,$3,$NF&#125;&#x27; /etc/passwd</span><br></pre></td></tr></table></figure></div>
+<h5 id="范围表达式">3.2.3 范围表达式</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/哪里开始/,/哪里结束/ (最常用的语法)</span></span><br><span class="line">awk &#x27;/11:02:00/,/11:02:30/&#123;print $1&#125;&#x27; access.log # 打印30秒内日志的第一行</span><br></pre></td></tr></table></figure></div>
+<h5 id="特殊模式begin和end">3.2.3 特殊模式BEGIN{}和END</h5>
+<p><strong>BEGIN{}</strong>：awk读取文件前执行，用于：</p>
+<ul>
+<li>进行简单统计/计算，</li>
+<li>添加表头</li>
+<li>用来定义awk变量(少用，一般用-v)</li>
+</ul>
+<p><strong>END{}</strong>：awk读取文件后执行，用于：</p>
+<ul>
+<li>进行统计，输入计算结果</li>
+<li>awk使用数组，用来输出数组的结果</li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th>统计方法</th>
+<th>简写形式</th>
+<th>应用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>i = i + 1</td>
+<td>i++</td>
+<td>计数</td>
+</tr>
+<tr class="even">
+<td>sum = sum + ?</td>
+<td>sum += ?</td>
+<td>求和</td>
+</tr>
+<tr class="odd">
+<td>array[] = array[] + 1</td>
+<td>array[]++</td>
+<td>数组分类计数</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>sum和i都是<strong>变量</strong></p>
+</blockquote>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">统计 /etc/services里有多少个空行</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">i++ 每行进行统计 | <span class="built_in">print</span> i 输出结果</span> </span><br><span class="line">awk &#x27;/^$/&#123;i++&#125;END&#123;print i&#125;&#x27; /etc/services</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">计算1+2+3+...+100</span></span><br><span class="line">seq 100|awk &#x27;&#123;sum += $1&#125;END&#123;print sum&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看过程</span></span><br><span class="line">seq 100|awk &#x27;&#123;sum += $1;print sum&#125;END&#123;print sum&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+<h4 id="awk数组">3.3 awk数组</h4>
+<ul>
+<li>统计日志：统计每个ip出现次数，统计每种状态码的出现次数，统计攻击者ip出现次数</li>
+<li>统计每个ip消耗的流量</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 5%">
+<col style="width: 55%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th>shell数组</th>
+<th>awk数组</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">形式</td>
+<td>array[0] = token1 array[1] = token2</td>
+<td>array[0] = token1 array[1] = token2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">使用</td>
+<td>echo ${array[0]} $(array[1]}</td>
+<td>print array[0] array[1]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">批处理</td>
+<td>for i in ${array[*]} <br>do <br> echo $i<br>done</td>
+<td>for(i in array)<br> print array[i]</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">错误写法：awk中所有字母都被识别为变量，字符串需要使用双引号围绕</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=token1;a[1]=token2;print a[0],a[1]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">正确写法</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=&quot;token1&quot;;a[1]=&quot;token2&quot;;print a[0],a[1]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">批处理</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=&quot;token1&quot;;a[1]=&quot;token2&quot;;for(i in a) print a[i]&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+<h5 id="范例一">范例一</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">处理以下文件内容，取出域名并进行计数和排序处理</span></span><br><span class="line">http://www.etiantian.org/index.html</span><br><span class="line">http://www.etiantian.org/index.html</span><br><span class="line">http://post.etiantian.org/index.html</span><br><span class="line">http://mp3.etiantian.org/index.html</span><br><span class="line">http://www.etiantian.org/3.html</span><br><span class="line">http://post.etiantian.org/2.html</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">需要计算</span></span><br><span class="line">www.etiantian.org 出现次数</span><br><span class="line">post.etiantian.org 出现次数</span><br><span class="line">mp3.etiantian.org 出现次数</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">代码</span></span><br><span class="line">awk -F/ &#x27;&#123;array[$3]++&#125;END&#123;for(i in array) print i,array[i]&#125;&#x27; test.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出结果</span></span><br><span class="line">mp3.etiantian.org 1</span><br><span class="line">www.etiantian.org 3</span><br><span class="line">post.etiantian.org 2</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">排序</span></span><br><span class="line">awk -F/ &#x27;&#123;array[$3]++&#125;END&#123;for(i in array) print i,array[i]&#125;&#x27; test.txt|sort -rnk2</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出结果</span></span><br><span class="line">www.etiantian.org 3</span><br><span class="line">post.etiantian.org 2</span><br><span class="line">mp3.etiantian.org 1</span><br></pre></td></tr></table></figure></div>
+<h4 id="awk循环和判断">3.4 awk循环和判断</h4>
+<h5 id="for循环">3.4.1 for循环</h5>
+<table>
+<colgroup>
+<col style="width: 56%">
+<col style="width: 43%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>shell的c语言for循环</th>
+<th>awk的for循环</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>for((i = 1; i &lt;= 10; i++)) <br>do<br> echo $n<br>done</td>
+<td>for(int i = 1; i &lt;= 10; i++)<br> print i</td>
+</tr>
+</tbody>
+</table>
+<p><div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">awk &#x27;BEGIN&#123;</span><br><span class="line">for(i=1;i&lt;=100;i++)</span><br><span class="line">	sum+=i; </span><br><span class="line">	print sum;</span><br><span class="line">&#125;&#x27;</span><br></pre></td></tr></table></figure></div></p>
+<h5 id="if判断">3.4.2 if判断</h5>
+<table>
+<colgroup>
+<col style="width: 50%">
+<col style="width: 49%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>shell if判断</th>
+<th>awk if判断</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>if["token -eq 18"]; then <br> echo take to do sth<br>else<br>
+echo "rest"<br>pass</td>
+<td>if(condition)<br> print sth<br>else<br> print other</td>
+</tr>
+</tbody>
+</table>
+<h5 id="范例2">范例2</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">统计这段语句中，单词中字符数小于6的单词，并显示</span></span><br><span class="line">echo I am a student studing in XMU university</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">代码 length(<span class="variable">$i</span>) 统计第i列的长度</span></span><br><span class="line">echo I am a student studing in XMU university. |awk &#x27;&#123;for(i=1;i&lt;=NF;i++)&#123;if(length($i) &lt;6) print $i&#125;&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+<h3 id="awk总结">4. awk总结</h3>
+<ul>
+<li><p>awk选项 -F -v</p></li>
+<li><p>awk执行流程</p></li>
+<li><p>awk取行取列</p></li>
+<li><p>awk模式：正则、范围、特殊模式</p></li>
+<li><p>awk数组</p></li>
+<li><p>awk控制：for / if</p></li>
+<li><p>awk帮助：man awk / info awk</p></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/05/08/JUnit/" rel="prev" title="JUnit">
+      <i class="fa fa-chevron-left"></i> JUnit
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">1. 简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">2. 执行过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 示例代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">3. 常用操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A1%8C%E5%92%8C%E5%88%97"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 行和列</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8F%96%E8%A1%8C"><span class="nav-number">3.1.1.</span> <span class="nav-text">3.1.1 取行</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8F%96%E5%88%97"><span class="nav-number">3.1.2.</span> <span class="nav-text">3.1.2 取列</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#awk%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 awk模式匹配</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">3.2.1.</span> <span class="nav-text">3.2.1 比较表达式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%AD%A3%E5%88%99"><span class="nav-number">3.2.2.</span> <span class="nav-text">3.2.2 正则</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8C%83%E5%9B%B4%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">3.2.3.</span> <span class="nav-text">3.2.3 范围表达式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E6%A8%A1%E5%BC%8Fbegin%E5%92%8Cend"><span class="nav-number">3.2.4.</span> <span class="nav-text">3.2.3 特殊模式BEGIN{}和END</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#awk%E6%95%B0%E7%BB%84"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 awk数组</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8C%83%E4%BE%8B%E4%B8%80"><span class="nav-number">3.3.1.</span> <span class="nav-text">范例一</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#awk%E5%BE%AA%E7%8E%AF%E5%92%8C%E5%88%A4%E6%96%AD"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 awk循环和判断</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#for%E5%BE%AA%E7%8E%AF"><span class="nav-number">3.4.1.</span> <span class="nav-text">3.4.1 for循环</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#if%E5%88%A4%E6%96%AD"><span class="nav-number">3.4.2.</span> <span class="nav-text">3.4.2 if判断</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8C%83%E4%BE%8B2"><span class="nav-number">3.4.3.</span> <span class="nav-text">范例2</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#awk%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">4. awk总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HWH"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">HWH</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/relink2021" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;relink2021" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:21620182203381@stu.xmu.edu.cn" title="E-Mail → mailto:21620182203381@stu.xmu.edu.cn" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/users/17353923/relink" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;users&#x2F;17353923&#x2F;relink" rel="noopener" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://stackoverflow.com/" title="https:&#x2F;&#x2F;stackoverflow.com" rel="noopener" target="_blank">Stack Overflow</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.github.com/" title="https:&#x2F;&#x2F;www.github.com" rel="noopener" target="_blank">Github</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leetcode-cn.com/" title="https:&#x2F;&#x2F;leetcode-cn.com" rel="noopener" target="_blank">Leetcode</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2022-04 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HWH</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -188,6 +188,120 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/25/GBDT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="HWH">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Relink">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/25/GBDT/" class="post-title-link" itemprop="url">数据挖掘模型——GBDT</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-05-25 20:14:20 / 修改时间：20:15:28" itemprop="dateCreated datePublished" datetime="2022-05-25T20:14:20+08:00">2022-05-25</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>参考资料：</p>
+<p><a target="_blank" rel="noopener" href="https://scikit-learn.org/stable/modules/ensemble.html?highlight=gbdt">scikit-learn.org</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/144855223">知乎文章：GBDT(梯度提升决策树)——来由、原理和python实现</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zpalyq110/article/details/79527653">CSDN文章：GBDT算法原理以及实例理解</a></p>
+</blockquote>
+<h4 id="一什么是gbdt">一、什么是GBDT？</h4>
+<p>GBDT的全称是Gradient Boosting Decision
+Tree(梯度提升决策树)，GBDT是一种<strong>集成模型</strong>，采用的基础模型是<strong>CART回归树</strong>。</p>
+<h4 id="二集成模型">二、集成模型</h4>
+<h5 id="背景">2.1 背景</h5>
+<p>几乎所有<strong>预测性质</strong>任务都可以抽象为基于已知数据<span class="math inline">\(x\)</span>预测未知数据<span class="math inline">\(y\)</span>，用函数形式表示，即 <span class="math display">\[y=f(x)\]</span></p>
+<p>但是，显然没有模型可以做到分毫不差地预测，预测值和真实值总是存在差异，<span class="math display">\[y=f(x) + residual\]</span></p>
+<p>其中<span class="math inline">\(residual\)</span>被称为残差，我们评价一个模型的预测能力，一般考虑残差的两个方面</p>
+<ol type="1">
+<li><strong>偏差</strong>，与真实值分布的偏差大小</li>
+<li><strong>方差</strong>，体现模型预测能力的稳定性</li>
+</ol>
+<p>GBDT采用了多模型集成策略，针对残差进行拟合，进而将降低模型的偏差和方差。</p>
+<h5 id="介绍">2.2 介绍</h5>
+<p>集成学习(Ensemble
+Model)是一种模型框架，将若干弱学习器按照一定的策略组合起来，共同完成一个任务，只要组合得当，就可以帮助集成模型降低预测的偏差或方差。</p>
+<p>常见的集成策略有bagging、stacking和boosting，GBDT显然属于第三种。</p>
+<h5 id="boosting模型">2.3 Boosting模型</h5>
+<p>Boosting模型采用将基础模型串联组合的形式，这类模型的思想是：既然一个基础模型可以做出不完美的预测，那么我们可以使用更多基础模型，对“不完美的部分”进行完善。对于GBDT来说，它会用第K个CART拟合前K-1个CART留下的残差，从而不断缩小整个模型的误差。</p>
+<blockquote>
+<p>通俗理解：一个人有30岁，首先使用20岁拟合，发现有10岁的损失。这时候使用6岁拟合剩下的损失，发现差距还有4岁，第三轮用3岁拟合剩下的差距，损失就只剩下1岁了。</p>
+<p>每一轮迭代，都将拟合的损失减少，经过若干轮迭代，剩余的损失越来越少。迭代结束后，就能得到一个较优的模型(也称为强学习器)，这就是GBDT原理的通俗理解。</p>
+</blockquote>
+<p><img src="/2022/05/25/GBDT/绘图1-1653476751454.png" alt="绘图1" style="zoom:80%;"></p>
+<h5 id="cart树">2.4 CART树</h5>
+<p>CART是Classification and Regression
+Tree的缩写，特指一种以二叉树为逻辑结构的，用于完成线性回归任务的决策树(决策树详细介绍见决策树.md)。</p>
+<p>CART回归树的思想是当事物的特征为<strong>连续变量</strong>时，使用一种新的策略，来选择用于分割样本的特征值。特征取值连续并允许重复使用，这一定会导致严重地过拟合，因此需要对CART回归树进行剪枝。</p>
+<p>CART回归树是GBDT的基础，因为GBDT每次迭代要拟合的是<strong>梯度值</strong>，这是一个连续值，因此要使用回归树。</p>
+<h4 id="三gbdt">三、GBDT</h4>
+<p>sklearn中有GBDT工具包，提供分类和回归方法。</p>
+<p><strong>GradientBoostingClassifier</strong>和
+<strong>GradientBoostingRegressor</strong>是小样本数据集的首选，这两个估计器的两个重要超参数是<code>n_estimators</code>和<code>learning_rate</code>。</p>
+<h5 id="分类gradientboostingclassifier">3.1
+分类：GradientBoostingClassifier</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="PYTHON"><figure class="iseeu highlight /python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 该分类器支持二分类和多分类</span></span><br><span class="line"><span class="comment"># 以下是将具有100个决策树桩的梯度提升分类器拟合为CART</span></span><br><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> GradientBoostingClassifier</span><br><span class="line">GradientBoostingClassifier(n_estimators=<span class="number">100</span>, learning_rate=<span class="number">1.0</span>, max_depth=<span class="number">1</span>, random_state=<span class="number">0</span>).fit(X_train, y_train)</span><br></pre></td></tr></table></figure></div>
+<p><strong>CART的数量</strong>由参数<code>n_estimators</code>控制，<strong>每棵树的大小</strong>由<code>max_depth</code>设置，<strong>叶节点的数量</strong>由<code>max_leaf_nodes</code>控制。<code>learning_rate</code>范围为(0.0,1.0]，通过收缩<strong>控制过拟合</strong>。</p>
+<blockquote>
+<p>注意：超过两个的分类需要引入参数n_classes，引入的树的数量等于n_classes
+* n_estimators。</p>
+<p>对于大数据，更推荐使用 HistGradientBoostingClassifier。</p>
+</blockquote>
+<h5 id="回归gradientboostingregressor">3.2
+回归：GradientBoostingRegressor</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="PYTHON"><figure class="iseeu highlight /python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 回归的默认损失函数的平方误差 squared_error</span></span><br><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> GradientBoostingRegressor</span><br><span class="line">est = GradientBoostingRegressor(n_estimators=<span class="number">100</span>, learning_rate=<span class="number">0.1</span>, max_depth=<span class="number">1</span>, random_state=<span class="number">0</span>, loss=<span class="string">&#x27;squared_error&#x27;</span>).fit(X_train, y_train)</span><br></pre></td></tr></table></figure></div>
+<h4 id="四提升gbdt效果的办法">四、提升GBDT效果的办法</h4>
+<h5 id="重采样">4.1 重采样</h5>
+<p>将boosting和bagging相结合，每次迭代中，基础分类器都会根据<code>subsample</code>在可用训练数据中取一部分进行训练。子样本在没有替换的情况下抽取，典型值为<code>subsample=0.5</code></p>
+<h5 id="验证方法">4.2 验证方法</h5>
+<p>对于小样本，一般采用交叉验证法</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/05/18/awk/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2551,110 +2665,6 @@ Factory：抽象工厂模式</h4>
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/29/%E5%BA%8F%E5%88%97%E5%8C%96%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="HWH">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Relink">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/29/%E5%BA%8F%E5%88%97%E5%8C%96%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-title-link" itemprop="url">序列化和反序列化</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-29 14:32:38" itemprop="dateCreated datePublished" datetime="2022-04-29T14:32:38+08:00">2022-04-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-05 10:26:29" itemprop="dateModified" datetime="2022-05-05T10:26:29+08:00">2022-05-05</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="序列化和反序列化的定义">序列化和反序列化的定义</h4>
-<p><strong>序列化</strong>：把对象转化为可传输的字节序列的过程</p>
-<p><strong>反序列化</strong>：把字节序列还原为对象的过程</p>
-<hr>
-<h4 id="为什么要序列化">为什么要序列化</h4>
-<p><strong>目的</strong>：让对象可以<strong>跨平台存储</strong>和进行<strong>网络传输</strong></p>
-<p><strong>因果</strong>：网络传输的方式是I/O <span class="math inline">\(\rightarrow\)</span> I/O支持的数据格式为字节数组
-<span class="math inline">\(\rightarrow\)</span>
-对象要传输需要序列化为字节序列</p>
-<p><strong>规范</strong>：序列化需要遵循规则，使得传输到目的地的字节序列能通过该规则反序列化还原为对象</p>
-<hr>
-<h4 id="需要序列化的场景">需要序列化的场景</h4>
-<p>凡是需要<strong>跨平台存储</strong>和<strong>网络传输</strong>的数据，都需要序列化</p>
-<p>网络传输本质：对象 <span class="math inline">\(\rightarrow\)</span>
-字节序列 <span class="math inline">\(\rightarrow\)</span> 网络 <span class="math inline">\(\rightarrow\)</span> 字节序列 <span class="math inline">\(\rightarrow\)</span> 对象</p>
-<p>跨平台存储本质：对象 <span class="math inline">\(\rightarrow\)</span>
-跨平台字节码 <span class="math inline">\(\rightarrow\)</span> 跨平台
-<span class="math inline">\(\rightarrow\)</span> 跨平台字节码 <span class="math inline">\(\rightarrow\)</span> 对象</p>
-<hr>
-<h4 id="序列化的选择">序列化的选择</h4>
-<p><strong>常见的序列化方式</strong></p>
-<p>不支持跨语言：JDK、Kryo、FST</p>
-<p>支持跨语言：JSON、Hessian、Thrift、Protostuff</p>
-<p><strong>序列化的速度</strong></p>
-<p>如果一个项目中需要序列化的场景很多，那么选择序列化效率高的协议能显著提高系统性能</p>
-<p><strong>序列化字节序列的大小</strong></p>
-<p>数据越小越好，传输快，提升系统性能</p>
-<hr>
-<h4 id="java中的序列化">Java中的序列化</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Java中要实现序列化，只需要实现Serializable接口即可</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment"> * 需要注意的问题</span></span><br><span class="line"><span class="comment"> * 1. static属性不能被序列化</span></span><br><span class="line"><span class="comment"> * 序列化保存的是对象的状态，静态变量属于类的状态，因此序列化不保存静态变量</span></span><br><span class="line"><span class="comment"> * 2. transient属性不会被序列化</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">transient</span> ElemType t;</span><br><span class="line">    <span class="keyword">private</span> ElemType e;    </span><br><span class="line">    <span class="comment">// 经过序列化和反序列化，t中的值会丢失(t == null)，e中的值不会丢失(e == something)</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h4 id="序列化版本号serialversionuid">序列化版本号serialVersionUID</h4>
-<p>所有实现序列化的对象都必须有一个版本号，可以自定义，否则JDK工具会按照对象属性自动生成</p>
-<p><strong>版本号的用途</strong></p>
-<p>在序列化业务需求发生变化后，通过修改版本号告诉反序列化一方的对象需要同步修改</p>
-<p><strong>JDK自动生成的版本号和我们自定义的版本号的区别</strong></p>
-<p>JDK根据对象的属性信息生成版本号，意味着对象的属性和序列化版本号会同步改变</p>
-<p>坏处：只要对象有一点小变动版本号就会变更，用户必须强制更新软件，而现实需求应该是：<strong>用户可以选择不更新，不更新仅仅无法体验新增加的功能而已</strong>，而这时候就需要我们自定义的版本号了，<strong>只要序列化版本一样，对象新增属性不会影响反序列化对象</strong>。</p>
-<hr>
-<h4 id="父类子类序列化问题">父类、子类序列化问题</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1.父类不实现序列化，子类实现序列化</span></span><br><span class="line"><span class="comment">// 父类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Parent</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String hobby;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">extends</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化后再反序列化</span></span><br><span class="line"><span class="comment">// 最终结果：父类结果未被序列化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2.父类实现序列化，子类不实现序列化</span></span><br><span class="line"><span class="comment">// 父类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String hobby;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">extends</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化后再反序列化</span></span><br><span class="line"><span class="comment">// 最终结果：子类属性序列化正常</span></span><br></pre></td></tr></table></figure></div>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2726,14 +2736,14 @@ Factory：抽象工厂模式</h4>
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

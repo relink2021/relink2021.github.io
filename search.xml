@@ -380,6 +380,36 @@ Factory：抽象工厂模式</h4>
       </tags>
   </entry>
   <entry>
+    <title>数据挖掘模型——ExtraTree</title>
+    <url>/2022/05/25/ExtraTree/</url>
+    <content><![CDATA[<blockquote>
+<p>参考资料：</p>
+<p><a href="https://scikit-learn.org/stable/modules/ensemble.html#extremely-randomized-trees">sklearn.org</a></p>
+<p><a href="https://blog.csdn.net/dili8870/article/details/101506670">模型融合---ExtraTree（极限树）总结</a></p>
+</blockquote>
+<h4 id="一什么是extratree">一、什么是ExtraTree</h4>
+<p>ExtraTree(极限树)和随机森林算法十分相似，都是由许多决策树构成。极限树与随机森林的主要区别在于：</p>
+<ul>
+<li>随机森林应用<strong>Bagging模型</strong>，extraTree使用<strong>所有的样本(不随机采样)</strong>，且特征随机选取，在某种程度上比随机森林得到的结果更好。</li>
+<li>随机森林在<strong>随机子集</strong>内得到最佳分叉属性，ET是<strong>完全随机</strong>得到分叉值。</li>
+</ul>
+<p>因此ExtraTree又称为Extremely Randomized
+Trees(极度随机化的树)，有点是能够进一步减少模型的方差，提高预测的稳定性，代价是偏差稍微增加，预测能力略微下降。</p>
+<blockquote>
+<p>对ExtraTree的了解非常有限，b站上没有任何一个专门的视频讲解ExtraTree</p>
+<p>总结一句话：如果需要稳定的预测，则使用极限树；如果需要更强的预测能力，则使用随机森林</p>
+</blockquote>
+<h4 id="二使用方法">二、使用方法</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="PYTHON"><figure class="iseeu highlight /python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> ExtraTreesClassifier</span><br><span class="line">clf = ExtraTreesClassifier(n_estimators=<span class="number">10</span>, max_depth=<span class="literal">None</span>,min_samples_split=<span class="number">2</span>, random_state=<span class="number">0</span>)</span><br><span class="line"><span class="comment"># 五则交叉验证</span></span><br><span class="line">scores = cross_val_score(clf, X, y, cv=<span class="number">5</span>)</span><br></pre></td></tr></table></figure></div>
+<p>主要参数是<code>n_estimators</code>和
+<code>max_features</code>，前者是森林中树的数量，默认值100；后者是寻找最佳分割是要考虑的特征数量。</p>
+]]></content>
+      <tags>
+        <tag>数据挖掘</tag>
+        <tag>机器学习</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>数据挖掘模型——GBDT</title>
     <url>/2022/05/25/GBDT/</url>
     <content><![CDATA[<blockquote>

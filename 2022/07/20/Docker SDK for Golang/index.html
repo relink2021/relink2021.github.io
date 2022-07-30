@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"manual","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Docker SDK for Golang Docker官方提供了一套Go语言的SDK，让开发者能够以进行Docker应用程序的构建和扩展 一、安装SDKs 1go get github.com&#x2F;docker&#x2F;docker&#x2F;client 二、管理本地的Docker 使用SDK之前需要取消勾选红框中的选项，否则会报2375端口占用   image-20220720151655652">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Relink">
+<meta property="og:url" content="http://example.com/2022/07/20/Docker%20SDK%20for%20Golang/index.html">
+<meta property="og:site_name" content="Relink">
+<meta property="og:description" content="Docker SDK for Golang Docker官方提供了一套Go语言的SDK，让开发者能够以进行Docker应用程序的构建和扩展 一、安装SDKs 1go get github.com&#x2F;docker&#x2F;docker&#x2F;client 二、管理本地的Docker 使用SDK之前需要取消勾选红框中的选项，否则会报2375端口占用   image-20220720151655652">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2022/07/20/Docker%20SDK%20for%20Golang/image-20220720151655652.png">
+<meta property="og:image" content="http://example.com/2022/07/20/Docker%20SDK%20for%20Golang/docker.png">
+<meta property="article:published_time" content="2022-07-20T06:45:16.093Z">
+<meta property="article:modified_time" content="2022-07-21T01:40:05.951Z">
+<meta property="article:author" content="HWH">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2022/07/20/Docker%20SDK%20for%20Golang/image-20220720151655652.png">
+
+<link rel="canonical" href="http://example.com/2022/07/20/Docker%20SDK%20for%20Golang/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title> | Relink</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Relink</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/07/20/Docker%20SDK%20for%20Golang/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="HWH">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Relink">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-07-20 14:45:16" itemprop="dateCreated datePublished" datetime="2022-07-20T14:45:16+08:00">2022-07-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-07-21 09:40:05" itemprop="dateModified" datetime="2022-07-21T09:40:05+08:00">2022-07-21</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="docker-sdk-for-golang">Docker SDK for Golang</h2>
+<p>Docker官方提供了一套Go语言的SDK，让开发者能够以进行Docker应用程序的构建和扩展</p>
+<h4 id="一安装sdks">一、安装SDKs</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go get github.com/docker/docker/client</span><br></pre></td></tr></table></figure></div>
+<h4 id="二管理本地的docker">二、管理本地的Docker</h4>
+<p>使用SDK之前需要<strong>取消勾选</strong>红框中的选项，否则会报<strong>2375端口占用</strong></p>
+<figure>
+<img src="/2022/07/20/Docker%20SDK%20for%20Golang/image-20220720151655652.png" alt="image-20220720151655652">
+<figcaption aria-hidden="true">image-20220720151655652</figcaption>
+</figure>
+<h5 id="docker-sdk总体流程">* docker sdk总体流程</h5>
+<p><img src="/2022/07/20/Docker%20SDK%20for%20Golang/docker.png" alt="docker" style="zoom:80%;"></p>
+<h5 id="docker-sdk和命令行对应关系">* docker sdk和命令行对应关系</h5>
+<table>
+<thead>
+<tr class="header">
+<th>SDK</th>
+<th>CMD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cli.ImagePull</td>
+<td>docker pull</td>
+</tr>
+<tr class="even">
+<td>cli.ContainerCreate</td>
+<td>docker create</td>
+</tr>
+<tr class="odd">
+<td>cli.ContainerStart</td>
+<td>docker start</td>
+</tr>
+<tr class="even">
+<td>cli.ContainerWait</td>
+<td>docker wait</td>
+</tr>
+<tr class="odd">
+<td>cli.ContainerLogs</td>
+<td>docker logs</td>
+</tr>
+<tr class="even">
+<td>cli.ContainerList</td>
+<td>docker ps</td>
+</tr>
+<tr class="odd">
+<td>cli.ContainerStop</td>
+<td>docker stop</td>
+</tr>
+<tr class="even">
+<td>cli.ImageList</td>
+<td>docker images</td>
+</tr>
+<tr class="odd">
+<td>cli.ContainerCommit</td>
+<td>docker commit</td>
+</tr>
+<tr class="even">
+<td>cli.ImageBuild</td>
+<td>docker build</td>
+</tr>
+<tr class="odd">
+<td>cli.ContainerRemove</td>
+<td>docker rm</td>
+</tr>
+<tr class="even">
+<td>cli.ImageRemove</td>
+<td>docker rmi</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>下面的代码行过长，建议开启全屏观看</strong></p>
+</blockquote>
+<h5 id="运行容器">1. 运行容器</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker run docker.io/library/alpine <span class="built_in">echo</span> <span class="string">&quot;hello world&quot;</span></span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types/container&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/pkg/stdcopy&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// context: goroutine运行时</span></span><br><span class="line">    <span class="comment">// context.Background(): 返回一个空的context</span></span><br><span class="line">	ctx := context.Background()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// NewClientWithOpts(ops ...Opt) (*Client, error): 根据选项配置新建一个client</span></span><br><span class="line">    <span class="comment">// 这里的选择是读取环境变量和api版本来新建对应的client(没有设置则为默认值)</span></span><br><span class="line">    <span class="comment">// cli: 通过client可以调用docker大部分的api</span></span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 拉取镜像&quot;docker.io/library/alpine&quot;，该api在下文有介绍</span></span><br><span class="line">	reader, err := cli.ImagePull(ctx, <span class="string">&quot;docker.io/library/alpine&quot;</span>, types.ImagePullOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	io.Copy(os.Stdout, reader)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, platform *specs.Platform, containerName string) (container.ContainerCreateCreatedBody, error): 创建容器</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// config: 容器配置，内容非常丰富，涵盖了Dockerfile的各种定义项，这里选择镜像为alpine，命令行输出&quot;hello world&quot;</span></span><br><span class="line">    <span class="comment">// hostConfig: 主机配置，这里设置为默认</span></span><br><span class="line">    <span class="comment">// networkingConfig: 网络配置，这里设置为默认</span></span><br><span class="line">    <span class="comment">// platform: 选择平台，这里设置为默认</span></span><br><span class="line">    <span class="comment">// containerName: 容器名称，这里设置为默认</span></span><br><span class="line">    <span class="comment">// resp: 返回的容器结构体，包含容器的各项信息</span></span><br><span class="line">	resp, err := cli.ContainerCreate(ctx, &amp;container.Config&#123;</span><br><span class="line">		Image: <span class="string">&quot;alpine&quot;</span>,</span><br><span class="line">		Cmd:   []<span class="type">string</span>&#123;<span class="string">&quot;echo&quot;</span>, <span class="string">&quot;hello world&quot;</span>&#125;,</span><br><span class="line">	&#125;, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerStart(ctx context.Context, containerID string, options types.ContainerStartOptions) error</span></span><br><span class="line">    <span class="comment">// 这是启动容器的api</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// containerID: 容器ID，这里选择刚刚创建容器ID</span></span><br><span class="line">    <span class="comment">// options: 容器启动方式，这里选择默认</span></span><br><span class="line">	<span class="keyword">if</span> err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions&#123;&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerWait(ctx context.Context, containerID string, condition container.WaitCondition) (&lt;-chan container.ContainerWaitOKBody, &lt;-chan error): 等待，直到容器处于某种状态后进行后续操作</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// containerID: 容器ID，这里选择刚刚创建容器ID</span></span><br><span class="line">    <span class="comment">// condition: 容器状态，这里选择等待直到容器运行结束</span></span><br><span class="line">	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)</span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> err := &lt;-errCh:</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="built_in">panic</span>(err)</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">case</span> &lt;-statusCh:</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取刚刚创建的容器的日志，该api在下文有介绍</span></span><br><span class="line">	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions&#123;ShowStdout: <span class="literal">true</span>&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">	stdcopy.StdCopy(os.Stdout, os.Stderr, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="后台运行容器">* 后台运行容器</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker run <span class="literal">-d</span> bfirsh/reticulate<span class="literal">-splines</span></span><br></pre></td></tr></table></figure></div>
+<p>没有使用<strong>ContainerWait</strong>则说明在后台使用容器，不等待容器的状态直接结束程序，其余与上文相同。</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types/container&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	imageName := <span class="string">&quot;bfirsh/reticulate-splines&quot;</span></span><br><span class="line"></span><br><span class="line">	out, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	io.Copy(os.Stdout, out)</span><br><span class="line"></span><br><span class="line">	resp, err := cli.ContainerCreate(ctx, &amp;container.Config&#123;</span><br><span class="line">		Image: imageName,</span><br><span class="line">	&#125;, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions&#123;&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(resp.ID)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="查看容器列表">2. 查看容器列表</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker <span class="built_in">ps</span></span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)</span></span><br><span class="line">    <span class="comment">// ContainerList: 查看容器列表的api</span></span><br><span class="line">    <span class="comment">// options: 查看容器列表的选项</span></span><br><span class="line">    <span class="comment">// containers: 容器列表结构体，包含ID、镜像、挂载卷等信息</span></span><br><span class="line">	containers, err := cli.ContainerList(ctx, types.ContainerListOptions&#123;</span><br><span class="line">        <span class="comment">// All:true  如果添加该项，则等价于docker ps -a，即查看所有容器列表</span></span><br><span class="line">    &#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里仅打印容器ID，根据需要可灵活选择</span></span><br><span class="line">	<span class="keyword">for</span> _, container := <span class="keyword">range</span> containers &#123;</span><br><span class="line">		fmt.Println(container.ID)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="停止所有运行中的容器生产环境下禁用">3.
+停止所有运行中的容器(生产环境下禁用)</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker stop <span class="variable">$</span>(docker <span class="built_in">ps</span> <span class="literal">-a</span> <span class="literal">-q</span>)</span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	containers, err := cli.ContainerList(ctx, types.ContainerListOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取镜像列表后通过循环关闭每个容器</span></span><br><span class="line">	<span class="keyword">for</span> _, container := <span class="keyword">range</span> containers &#123;</span><br><span class="line">		fmt.Print(<span class="string">&quot;Stopping container &quot;</span>, container.ID[:<span class="number">10</span>], <span class="string">&quot;... &quot;</span>)</span><br><span class="line">        <span class="comment">// ContainerStop(ctx context.Context, containerID string, timeout *time.Duration) error</span></span><br><span class="line">        <span class="comment">// 根据containerID关闭容器</span></span><br><span class="line">        <span class="comment">// timeout: 如果容器无法关闭，那么会在timeout指定的时间过后强制kill，nil表示如果无法关闭则保留容器</span></span><br><span class="line">		<span class="keyword">if</span> err := cli.ContainerStop(ctx, container.ID, <span class="literal">nil</span>); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="built_in">panic</span>(err)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Println(<span class="string">&quot;Success&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="获取指定容器的日志">4. 获取指定容器的日志</h5>
+<p>通过指定容器的ID，我们可以获取对应ID的容器的日志</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	options := types.ContainerLogsOptions&#123;ShowStdout: <span class="literal">true</span>&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error): 通过容器ID获取容器日志</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// containerID: 容器ID，这里选择刚刚创建容器ID</span></span><br><span class="line">    <span class="comment">// options: 查看日志选项，这里选择在控制台标准输出</span></span><br><span class="line">	out, err := cli.ContainerLogs(ctx, <span class="string">&quot;f1064a8a4c82&quot;</span>, options)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	io.Copy(os.Stdout, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="查看镜像列表">5. 查看镜像列表</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 相当于如下命令</span></span><br><span class="line">docker images</span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// ImageList(ctx context.Context, options types.ImageListOptions) ([]types.ImageSummary, error)</span></span><br><span class="line">    <span class="comment">// ImageList: 查看镜像列表的api</span></span><br><span class="line">    <span class="comment">// options: 查看镜像列表的选项</span></span><br><span class="line">    <span class="comment">// images: 镜像列表结构体，包含ID、创建时间等信息</span></span><br><span class="line">	images, err := cli.ImageList(ctx, types.ImageListOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 此处仅打印镜像id</span></span><br><span class="line">	<span class="keyword">for</span> _, image := <span class="keyword">range</span> images &#123;</span><br><span class="line">		fmt.Println(image.ID)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="拉取镜像">6. 拉取镜像</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 相当于如下命令</span></span><br><span class="line">docker pull alpine</span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) (io.ReadCloser, error)</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// refStr: 拉取的目标镜像名，这里拉取的镜像名称为&quot;alpine&quot;</span></span><br><span class="line">    <span class="comment">// options: 拉取镜像时的选择，这里没有额外选择</span></span><br><span class="line">	out, err := cli.ImagePull(ctx, <span class="string">&quot;alpine&quot;</span>, types.ImagePullOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">defer</span> out.Close()</span><br><span class="line"></span><br><span class="line">	io.Copy(os.Stdout, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="拉取私有镜像">* 拉取私有镜像</h5>
+<p>除了公开镜像，平时可能还会用到一些私有镜像，可以是DockerHub
+上私有镜像，也可以是自托管的镜像仓库。这时需要提供对应的凭证才可以拉取镜像</p>
+<blockquote>
+<p><strong>在使用 Docker API 的 Go SDK
+时，凭证是以明文的方式进行传输的，所以如果是自建的镜像仓库，请务必使用
+<code>HTTPS</code>！</strong></p>
+</blockquote>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;context&quot;</span></span><br><span class="line">    <span class="string">&quot;encoding/base64&quot;</span></span><br><span class="line">    <span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">    <span class="string">&quot;io&quot;</span></span><br><span class="line">    <span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    ctx := context.Background()</span><br><span class="line">    cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 登录凭证配置，在这里面填写账号密码</span></span><br><span class="line">    authConfig := types.AuthConfig&#123;</span><br><span class="line">        Username: <span class="string">&quot;username&quot;</span>,</span><br><span class="line">        Password: <span class="string">&quot;password&quot;</span>,</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 编码为JSON格式</span></span><br><span class="line">    encodedJSON, err := json.Marshal(authConfig)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 加密为BASE64编码</span></span><br><span class="line">    authStr := base64.URLEncoding.EncodeToString(encodedJSON)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在types.ImagePullOptions中设置登录凭证</span></span><br><span class="line">    out, err := cli.ImagePull(ctx, <span class="string">&quot;alpine&quot;</span>, types.ImagePullOptions&#123;RegistryAuth: authStr&#125;)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">defer</span> out.Close()</span><br><span class="line">    io.Copy(os.Stdout, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="保存容器为镜像">7. 保存容器为镜像</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types/container&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	createResp, err := cli.ContainerCreate(ctx, &amp;container.Config&#123;</span><br><span class="line">		Image: <span class="string">&quot;alpine&quot;</span>,</span><br><span class="line">		Cmd:   []<span class="type">string</span>&#123;<span class="string">&quot;touch&quot;</span>, <span class="string">&quot;/helloworld&quot;</span>&#125;,</span><br><span class="line">	&#125;, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := cli.ContainerStart(ctx, createResp.ID, types.ContainerStartOptions&#123;&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	statusCh, errCh := cli.ContainerWait(ctx, createResp.ID, container.WaitConditionNotRunning)</span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> err := &lt;-errCh:</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="built_in">panic</span>(err)</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">case</span> &lt;-statusCh:</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerCommit(ctx context.Context, container string, options types.ContainerCommitOptions) (types.IDResponse, error): 将一个容器保存为镜像</span></span><br><span class="line">    <span class="comment">// options: commit时附带的选项，这里设置Reference为&quot;helloworld&quot;</span></span><br><span class="line">	commitResp, err := cli.ContainerCommit(ctx, createResp.ID, types.ContainerCommitOptions&#123;Reference: <span class="string">&quot;helloworld&quot;</span>&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(commitResp.ID)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="dockerfile构建镜像">8. Dockerfile构建镜像</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;archive/tar&quot;</span></span><br><span class="line">	<span class="string">&quot;bytes&quot;</span></span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;io/ioutil&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line"></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将Dockerfile转化为流</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">createDockerTarFile</span><span class="params">(dockerfile <span class="type">string</span>)</span></span> (io.Reader, <span class="type">error</span>) &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> buf bytes.Buffer</span><br><span class="line">	tw := tar.NewWriter(&amp;buf)</span><br><span class="line">	f, err := os.Open(dockerfile)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> f.Close()</span><br><span class="line"></span><br><span class="line">	body, err := ioutil.ReadAll(f)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	hdr := &amp;tar.Header&#123;</span><br><span class="line">		Name: f.Name(),</span><br><span class="line">		Mode: <span class="number">0600</span>,</span><br><span class="line">		Size: <span class="type">int64</span>(<span class="built_in">len</span>(body)),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	tw.WriteHeader(hdr)</span><br><span class="line">	_,err = tw.Write(body)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> &amp;buf, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 利用cli.ImageBuild构建镜像</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BuildImage</span><span class="params">(cli *client.Client, dockerfile, project, imageName <span class="type">string</span>,tagVersion <span class="type">string</span>)</span></span> <span class="type">error</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将Dockerfile转化为流</span></span><br><span class="line">	dockerBuildContext, err := createDockerTarFile(dockerfile)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 读取镜像名和镜像版本</span></span><br><span class="line">	tags := fmt.Sprintf(<span class="string">&quot;%s:%s&quot;</span>,imageName, tagVersion)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 指定镜像构建选项</span></span><br><span class="line">	buildOptions := types.ImageBuildOptions&#123;</span><br><span class="line">		Dockerfile: <span class="string">&quot;Dockerfile&quot;</span>,  <span class="comment">// 可选，&quot;Dockerfile&quot;为默认值</span></span><br><span class="line">		Tags:       []<span class="type">string</span>&#123;tags&#125;,</span><br><span class="line">		Labels: <span class="keyword">map</span>[<span class="type">string</span>]<span class="type">string</span>&#123;</span><br><span class="line">			project: <span class="string">&quot;project&quot;</span>,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用Dockerfile字节流和buildOptions构建容器</span></span><br><span class="line">	output, err := cli.ImageBuild(context.Background(), dockerBuildContext, buildOptions)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 以下皆为后处理</span></span><br><span class="line">	body, err := ioutil.ReadAll(output.Body)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;Build resource image output: %v\n&quot;</span>, <span class="type">string</span>(body))</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> strings.Contains(<span class="type">string</span>(body), <span class="string">&quot;error&quot;</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;build image to docker error&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 指定Dockerfile名称，标签，镜像名和镜像版本来构建镜像</span></span><br><span class="line">	err = BuildImage(cli, <span class="string">&quot;Dockerfile&quot;</span>, <span class="string">&quot;test&quot;</span>, <span class="string">&quot;nginx&quot;</span>,<span class="string">&quot;latest&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<h5 id="其他少用的操作删除等">9. 其他少用的操作(删除等)</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// docker rm d55d5e104495</span></span><br><span class="line">err := cli.ContainerRemove(ctx, <span class="string">&quot;d55d5e104495&quot;</span>, types.ContainerRemoveOptions&#123;&#125;)</span><br><span class="line"><span class="comment">// docker rmi d7d3d98c851f</span></span><br><span class="line">item, err := cli.ImageRemove(ctx, <span class="string">&quot;d55d5e104495&quot;</span>, types.ImageRemoveOptions&#123;&#125;)</span><br></pre></td></tr></table></figure></div>
+<h4 id="三管理远程docker">三、管理远程Docker</h4>
+<p>除了可以管理本地的 Docker， 我们同样也可以通过使用 Golang + Docker
+API 管理远程的 Docker。</p>
+<h5 id="远程连接">1. 远程连接</h5>
+<p>默认 Docker 是通过非网络的 Unix
+套接字运行的，只能够进行本地通信（<code>/var/run/docker.sock</code>），是不能够直接远程连接
+Docker 的。</p>
+<p>需要编辑配置文件
+<code>/etc/docker/daemon.json</code>，并修改以下内容（把
+<code>192.168.59.3</code> 改为远程docker的 IP 地址），然后重启
+Docker</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JSON"><figure class="iseeu highlight /json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># vi /etc/docker/daemon.json</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;hosts&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;tcp://192.168.59.3:2375&quot;</span><span class="punctuation">,</span>   </span><br><span class="line">    <span class="string">&quot;unix:///var/run/docker.sock&quot;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"># 修改后重启容器</span><br><span class="line">systemctl restart docker</span><br></pre></td></tr></table></figure></div>
+<h5 id="修改client">2. 修改client</h5>
+<p>创建 <code>client</code> 的时候需要指定远程 Docker
+的地址，这样就可以像管理本地 Docker 一样管理远程的 Docker 了</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cli, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation(),</span><br><span class="line">    client.WithHost(<span class="string">&quot;tcp://192.168.59.3:2375&quot;</span>))</span><br></pre></td></tr></table></figure></div>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/05/25/ExtraTree/" rel="prev" title="数据挖掘模型——ExtraTree">
+      <i class="fa fa-chevron-left"></i> 数据挖掘模型——ExtraTree
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-sdk-for-golang"><span class="nav-number">1.</span> <span class="nav-text">Docker SDK for Golang</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E5%AE%89%E8%A3%85sdks"><span class="nav-number">1.0.1.</span> <span class="nav-text">一、安装SDKs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E7%AE%A1%E7%90%86%E6%9C%AC%E5%9C%B0%E7%9A%84docker"><span class="nav-number">1.0.2.</span> <span class="nav-text">二、管理本地的Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#docker-sdk%E6%80%BB%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">* docker sdk总体流程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#docker-sdk%E5%92%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">* docker sdk和命令行对应关系</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="nav-number">1.0.2.3.</span> <span class="nav-text">1. 运行容器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%90%8E%E5%8F%B0%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="nav-number">1.0.2.4.</span> <span class="nav-text">* 后台运行容器</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%AE%B9%E5%99%A8%E5%88%97%E8%A1%A8"><span class="nav-number">1.0.2.5.</span> <span class="nav-text">2. 查看容器列表</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2%E6%89%80%E6%9C%89%E8%BF%90%E8%A1%8C%E4%B8%AD%E7%9A%84%E5%AE%B9%E5%99%A8%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%A6%81%E7%94%A8"><span class="nav-number">1.0.2.6.</span> <span class="nav-text">3.
+停止所有运行中的容器(生产环境下禁用)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%8C%87%E5%AE%9A%E5%AE%B9%E5%99%A8%E7%9A%84%E6%97%A5%E5%BF%97"><span class="nav-number">1.0.2.7.</span> <span class="nav-text">4. 获取指定容器的日志</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E9%95%9C%E5%83%8F%E5%88%97%E8%A1%A8"><span class="nav-number">1.0.2.8.</span> <span class="nav-text">5. 查看镜像列表</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8B%89%E5%8F%96%E9%95%9C%E5%83%8F"><span class="nav-number">1.0.2.9.</span> <span class="nav-text">6. 拉取镜像</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8B%89%E5%8F%96%E7%A7%81%E6%9C%89%E9%95%9C%E5%83%8F"><span class="nav-number">1.0.2.10.</span> <span class="nav-text">* 拉取私有镜像</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BF%9D%E5%AD%98%E5%AE%B9%E5%99%A8%E4%B8%BA%E9%95%9C%E5%83%8F"><span class="nav-number">1.0.2.11.</span> <span class="nav-text">7. 保存容器为镜像</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#dockerfile%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F"><span class="nav-number">1.0.2.12.</span> <span class="nav-text">8. Dockerfile构建镜像</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E5%B0%91%E7%94%A8%E7%9A%84%E6%93%8D%E4%BD%9C%E5%88%A0%E9%99%A4%E7%AD%89"><span class="nav-number">1.0.2.13.</span> <span class="nav-text">9. 其他少用的操作(删除等)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%89%E7%AE%A1%E7%90%86%E8%BF%9C%E7%A8%8Bdocker"><span class="nav-number">1.0.3.</span> <span class="nav-text">三、管理远程Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5"><span class="nav-number">1.0.3.1.</span> <span class="nav-text">1. 远程连接</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9client"><span class="nav-number">1.0.3.2.</span> <span class="nav-text">2. 修改client</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="HWH"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">HWH</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/relink2021" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;relink2021" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:21620182203381@stu.xmu.edu.cn" title="E-Mail → mailto:21620182203381@stu.xmu.edu.cn" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/users/17353923/relink" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;users&#x2F;17353923&#x2F;relink" rel="noopener" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://stackoverflow.com/" title="https:&#x2F;&#x2F;stackoverflow.com" rel="noopener" target="_blank">Stack Overflow</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.github.com/" title="https:&#x2F;&#x2F;www.github.com" rel="noopener" target="_blank">Github</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://leetcode-cn.com/" title="https:&#x2F;&#x2F;leetcode-cn.com" rel="noopener" target="_blank">Leetcode</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2022-04 – 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">HWH</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

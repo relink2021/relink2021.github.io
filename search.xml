@@ -1222,29 +1222,6 @@ vs 自动化测试：<u>从是否需要人工介入来区分</u></h4>
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/2022/04/29/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very
-first post. Check <a href="https://hexo.io/docs/">documentation</a> for
-more info. If you get any problems when using Hexo, you can find the
-answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or
-you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="quick-start">Quick Start</h2>
-<h3 id="create-a-new-post">Create a new post</h3>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure></div>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="run-server">Run server</h3>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure></div>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="generate-static-files">Generate static files</h3>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure></div>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure></div>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>Linux三剑客之awk</title>
     <url>/2022/05/18/awk/</url>
     <content><![CDATA[<h3 id="简介">1. 简介</h3>
@@ -1450,61 +1427,27 @@ echo "rest"<br>pass</td>
       </tags>
   </entry>
   <entry>
-    <title>数学公式速查</title>
-    <url>/2022/08/10/%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E9%80%9F%E6%9F%A5/</url>
-    <content><![CDATA[<h4 id="一泰勒公式">一、泰勒公式</h4>
-<h5 id="带拉格朗日余项的n阶泰勒公式">1. 带拉格朗日余项的n阶泰勒公式</h5>
-<p><span class="math inline">\(f(x) = f(x_0) +
-f(x_0)&#39;(x-x_0)+\frac{f(x_0)&#39;&#39;}{2!}(x-x_0)^2+...+\frac{f(x_0){}^{(n)}}{n!}(x-x_0)^n
-+\frac{f(\varepsilon ){}^{(n+1)}}{(n+1)!}(x-x_0)^{n+1},\varepsilon
-介于x和x_0之间\)</span></p>
-<h5 id="带佩亚诺余项的n阶泰勒公式">2. 带佩亚诺余项的n阶泰勒公式</h5>
-<p><span class="math inline">\(f(x) = f(x_0) +
-f(x_0)&#39;(x-x_0)+\frac{f(x_0)&#39;&#39;}{2!}(x-x_0)^2+...+\frac{f(x_0){}^{(n)}}{n!}(x-x_0)^n
-+o((x-x_0)^n)\)</span></p>
-<h5 id="常见的低阶泰勒公式">3. 常见的低阶泰勒公式</h5>
-<p>$sinx = x - x<sup>3+o(x</sup>3) $ $arcsinx = x + x<sup>3+o(x</sup>3)
-$</p>
-<p><span class="math inline">\(tanx = x + \frac{1}{3}x^3+o(x^3)\)</span>
-$arctanx = x - x<sup>3+o(x</sup>3) $</p>
-<p>$cosx = 1 - x^2 + x^4 + o(x^4) $ <span class="math inline">\(e^x = 1
-+ x + \frac{x^2}{2!} + \frac{x^3}{3!} + o(x^3)\)</span></p>
-<p><span class="math inline">\(ln(1+x) = x - \frac{x^2}{2} +
-\frac{x^3}{3} + o(x^3)\)</span> $(1+x)^m = 1 + mx + x^2 + o(x^2) $</p>
-<h4 id="二等价无穷小">二、等价无穷小</h4>
-<p>当<span class="math inline">\(x \rightarrow 0\)</span>时，有</p>
-<p><span class="math inline">\(sinx \sim arcsinx \sim tanx \sim arctanx
-\sim e^x-1 \sim ln(x+1)\)</span></p>
-<p><span class="math inline">\(a^x-1 \sim xlna\)</span> $_{a}{(x+1)} $
-<span class="math inline">\((1+x)^m - 1 \sim mx\)</span> <span class="math inline">\(1-cos^2x\sim \frac 1 2x^2\)</span></p>
-<h4 id="三高阶求导公式">三、高阶求导公式</h4>
-<p><span class="math inline">\({(a^x)}^{(n)} = a^x(lna)^n(a&gt;0且a \ne
-1)\)</span> <span class="math inline">\((sin(kx))^{(n)}
-=k^nsin(kx+n\cdot \frac{\pi}{2})\)</span></p>
-<p><span class="math inline">\((lnx)^{(n)} = (-1)^n\frac{(n-1)!}{x^n}
-(x&gt;0)\)</span> $(xe<sup>x)</sup>{(n)} = (x+n)e^x $</p>
-<h4 id="四对数指数运算法则">四、对数指数运算法则</h4>
-<p><span class="math inline">\(log_{a}b =
-\frac{log_{c}b}{log_c{a}}\)</span></p>
-<h4 id="五因式分解">五、因式分解</h4>
-<p><span class="math inline">\((x+y)^3 =
-x^3+3x^2y+3xy^2+y^3\)</span></p>
-<p><span class="math inline">\((x-y)^3 =
-x^3-3x^2y+3xy^2-y^3\)</span></p>
-<p><span class="math inline">\(x^3-y^3 = (x-y)(x^2+xy+y^2)\)</span></p>
-<p><span class="math inline">\(x^3+y^3 = (x+y)(x^2-xy+y^2)\)</span></p>
-<h4 id="六不等式">六、不等式</h4>
-<h5 id="绝对值不等式">1. 绝对值不等式</h5>
-<p><span class="math inline">\(\left | a\pm b \right | \le \left | a
-\right | + \left | b \right |\)</span></p>
-<p><span class="math inline">\(\left |\left| a \right | - \left| b
-\right| \right | \le \left | a \right | - \left | b \right
-|\)</span></p>
-<p>$ $</p>
+    <title>Hello World</title>
+    <url>/2022/04/29/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very
+first post. Check <a href="https://hexo.io/docs/">documentation</a> for
+more info. If you get any problems when using Hexo, you can find the
+answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or
+you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="create-a-new-post">Create a new post</h3>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure></div>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="run-server">Run server</h3>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure></div>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="generate-static-files">Generate static files</h3>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure></div>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure></div>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
-      <tags>
-        <tag>考研数学</tag>
-      </tags>
   </entry>
   <entry>
     <title>序列化和反序列化</title>
@@ -1552,6 +1495,68 @@ x^3-3x^2y+3xy^2-y^3\)</span></p>
 ]]></content>
       <tags>
         <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数学公式速查</title>
+    <url>/2022/08/10/%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E9%80%9F%E6%9F%A5/</url>
+    <content><![CDATA[<h4 id="一泰勒公式">一、泰勒公式</h4>
+<h5 id="带拉格朗日余项的n阶泰勒公式">1. 带拉格朗日余项的n阶泰勒公式</h5>
+<p><span class="math inline">\(f(x) = f(x_0) +
+f(x_0)&#39;(x-x_0)+\frac{f(x_0)&#39;&#39;}{2!}(x-x_0)^2+...+\frac{f(x_0){}^{(n)}}{n!}(x-x_0)^n
++\frac{f(\varepsilon ){}^{(n+1)}}{(n+1)!}(x-x_0)^{n+1},\varepsilon
+介于x和x_0之间\)</span></p>
+<h5 id="带佩亚诺余项的n阶泰勒公式">2. 带佩亚诺余项的n阶泰勒公式</h5>
+<p><span class="math inline">\(f(x) = f(x_0) +
+f(x_0)&#39;(x-x_0)+\frac{f(x_0)&#39;&#39;}{2!}(x-x_0)^2+...+\frac{f(x_0){}^{(n)}}{n!}(x-x_0)^n
++o((x-x_0)^n)\)</span></p>
+<h5 id="常见的低阶泰勒公式">3. 常见的低阶泰勒公式</h5>
+<p><span class="math inline">\(sinx = x - \frac{1}{6}x^3+o(x^3)\)</span>
+<span class="math inline">\(arcsinx = x +
+\frac{1}{6}x^3+o(x^3)\)</span></p>
+<p><span class="math inline">\(tanx = x + \frac{1}{3}x^3+o(x^3)\)</span>
+<span class="math inline">\(arctanx = x -
+\frac{1}{3}x^3+o(x^3)\)</span></p>
+<p><span class="math inline">\(cosx = 1 - \frac{1}{2!}x^2 +
+\frac{1}{4!}x^4 + o(x^4)\)</span> <span class="math inline">\(e^x = 1 +
+x + \frac{x^2}{2!} + \frac{x^3}{3!} + o(x^3)\)</span></p>
+<p><span class="math inline">\(ln(1+x) = x - \frac{x^2}{2} +
+\frac{x^3}{3} + o(x^3)\)</span> <span class="math inline">\((1+x)^m = 1
++ mx + \frac{m(m-1)}{2!}x^2 + o(x^2)\)</span></p>
+<h4 id="二等价无穷小">二、等价无穷小</h4>
+<p>当<span class="math inline">\(x \rightarrow 0\)</span>时，有</p>
+<p><span class="math inline">\(sinx \sim arcsinx \sim tanx \sim arctanx
+\sim e^x-1 \sim ln(x+1)\)</span></p>
+<p><span class="math inline">\(a^x-1 \sim xlna\)</span> <span class="math inline">\(\log_{a}{(x+1)} \sim \frac{x}{lna}\)</span> <span class="math inline">\((1+x)^m - 1 \sim mx\)</span> <span class="math inline">\(1-cos^2x\sim \frac 1 2x^2\)</span></p>
+<h4 id="三高阶求导公式">三、高阶求导公式</h4>
+<p><span class="math inline">\({(a^x)}^{(n)} = a^x(lna)^n(a&gt;0且a \ne
+1)\)</span> <span class="math inline">\((sin(kx))^{(n)}
+=k^nsin(kx+n\cdot \frac{\pi}{2})\)</span></p>
+<p><span class="math inline">\((lnx)^{(n)} = (-1)^n\frac{(n-1)!}{x^n}
+(x&gt;0)\)</span> <span class="math inline">\((xe^x)^{(n)} =
+(x+n)e^x\)</span></p>
+<h4 id="四对数指数运算法则">四、对数指数运算法则</h4>
+<p><span class="math inline">\(log_{a}b =
+\frac{log_{c}b}{log_c{a}}\)</span></p>
+<h4 id="五因式分解">五、因式分解</h4>
+<p><span class="math inline">\((x+y)^3 =
+x^3+3x^2y+3xy^2+y^3\)</span></p>
+<p><span class="math inline">\((x-y)^3 =
+x^3-3x^2y+3xy^2-y^3\)</span></p>
+<p><span class="math inline">\(x^3-y^3 = (x-y)(x^2+xy+y^2)\)</span></p>
+<p><span class="math inline">\(x^3+y^3 = (x+y)(x^2-xy+y^2)\)</span></p>
+<h4 id="六不等式">六、不等式</h4>
+<h5 id="绝对值不等式">1. 绝对值不等式</h5>
+<p><span class="math inline">\(\left | a\pm b \right | \le \left | a
+\right | + \left | b \right |\)</span></p>
+<p><span class="math inline">\(\left |\left| a \right | - \left| b
+\right| \right | \le \left | a \right | - \left | b \right
+|\)</span></p>
+<p><span class="math inline">\(\sqrt{ab} \le \frac{a+b}{2} \le
+\sqrt{\frac{a^2+b^2}{2}}\)</span></p>
+]]></content>
+      <tags>
+        <tag>考研数学</tag>
       </tags>
   </entry>
   <entry>

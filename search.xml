@@ -82,139 +82,6 @@
       </tags>
   </entry>
   <entry>
-    <title></title>
-    <url>/2022/07/20/Docker%20SDK%20for%20Golang/</url>
-    <content><![CDATA[<h2 id="docker-sdk-for-golang">Docker SDK for Golang</h2>
-<p>Docker官方提供了一套Go语言的SDK，让开发者能够以进行Docker应用程序的构建和扩展</p>
-<h4 id="一安装sdks">一、安装SDKs</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line">go get github.com/docker/docker/client</span><br></pre></td></tr></table></figure></div>
-<h4 id="二管理本地的docker">二、管理本地的Docker</h4>
-<p>使用SDK之前需要<strong>取消勾选</strong>红框中的选项，否则会报<strong>2375端口占用</strong></p>
-<figure>
-<img src="/2022/07/20/Docker%20SDK%20for%20Golang/image-20220720151655652.png" alt="image-20220720151655652">
-<figcaption aria-hidden="true">image-20220720151655652</figcaption>
-</figure>
-<h5 id="docker-sdk总体流程">* docker sdk总体流程</h5>
-<p><img src="/2022/07/20/Docker%20SDK%20for%20Golang/docker.png" alt="docker" style="zoom:80%;"></p>
-<h5 id="docker-sdk和命令行对应关系">* docker sdk和命令行对应关系</h5>
-<table>
-<thead>
-<tr class="header">
-<th>SDK</th>
-<th>CMD</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>cli.ImagePull</td>
-<td>docker pull</td>
-</tr>
-<tr class="even">
-<td>cli.ContainerCreate</td>
-<td>docker create</td>
-</tr>
-<tr class="odd">
-<td>cli.ContainerStart</td>
-<td>docker start</td>
-</tr>
-<tr class="even">
-<td>cli.ContainerWait</td>
-<td>docker wait</td>
-</tr>
-<tr class="odd">
-<td>cli.ContainerLogs</td>
-<td>docker logs</td>
-</tr>
-<tr class="even">
-<td>cli.ContainerList</td>
-<td>docker ps</td>
-</tr>
-<tr class="odd">
-<td>cli.ContainerStop</td>
-<td>docker stop</td>
-</tr>
-<tr class="even">
-<td>cli.ImageList</td>
-<td>docker images</td>
-</tr>
-<tr class="odd">
-<td>cli.ContainerCommit</td>
-<td>docker commit</td>
-</tr>
-<tr class="even">
-<td>cli.ImageBuild</td>
-<td>docker build</td>
-</tr>
-<tr class="odd">
-<td>cli.ContainerRemove</td>
-<td>docker rm</td>
-</tr>
-<tr class="even">
-<td>cli.ImageRemove</td>
-<td>docker rmi</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p><strong>下面的代码行过长，建议开启全屏观看</strong></p>
-</blockquote>
-<h5 id="运行容器">1. 运行容器</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker run docker.io/library/alpine <span class="built_in">echo</span> <span class="string">&quot;hello world&quot;</span></span><br></pre></td></tr></table></figure></div>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types/container&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/pkg/stdcopy&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// context: goroutine运行时</span></span><br><span class="line">    <span class="comment">// context.Background(): 返回一个空的context</span></span><br><span class="line">	ctx := context.Background()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// NewClientWithOpts(ops ...Opt) (*Client, error): 根据选项配置新建一个client</span></span><br><span class="line">    <span class="comment">// 这里的选择是读取环境变量和api版本来新建对应的client(没有设置则为默认值)</span></span><br><span class="line">    <span class="comment">// cli: 通过client可以调用docker大部分的api</span></span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 拉取镜像&quot;docker.io/library/alpine&quot;，该api在下文有介绍</span></span><br><span class="line">	reader, err := cli.ImagePull(ctx, <span class="string">&quot;docker.io/library/alpine&quot;</span>, types.ImagePullOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	io.Copy(os.Stdout, reader)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, platform *specs.Platform, containerName string) (container.ContainerCreateCreatedBody, error): 创建容器</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// config: 容器配置，内容非常丰富，涵盖了Dockerfile的各种定义项，这里选择镜像为alpine，命令行输出&quot;hello world&quot;</span></span><br><span class="line">    <span class="comment">// hostConfig: 主机配置，这里设置为默认</span></span><br><span class="line">    <span class="comment">// networkingConfig: 网络配置，这里设置为默认</span></span><br><span class="line">    <span class="comment">// platform: 选择平台，这里设置为默认</span></span><br><span class="line">    <span class="comment">// containerName: 容器名称，这里设置为默认</span></span><br><span class="line">    <span class="comment">// resp: 返回的容器结构体，包含容器的各项信息</span></span><br><span class="line">	resp, err := cli.ContainerCreate(ctx, &amp;container.Config&#123;</span><br><span class="line">		Image: <span class="string">&quot;alpine&quot;</span>,</span><br><span class="line">		Cmd:   []<span class="type">string</span>&#123;<span class="string">&quot;echo&quot;</span>, <span class="string">&quot;hello world&quot;</span>&#125;,</span><br><span class="line">	&#125;, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerStart(ctx context.Context, containerID string, options types.ContainerStartOptions) error</span></span><br><span class="line">    <span class="comment">// 这是启动容器的api</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// containerID: 容器ID，这里选择刚刚创建容器ID</span></span><br><span class="line">    <span class="comment">// options: 容器启动方式，这里选择默认</span></span><br><span class="line">	<span class="keyword">if</span> err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions&#123;&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerWait(ctx context.Context, containerID string, condition container.WaitCondition) (&lt;-chan container.ContainerWaitOKBody, &lt;-chan error): 等待，直到容器处于某种状态后进行后续操作</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// containerID: 容器ID，这里选择刚刚创建容器ID</span></span><br><span class="line">    <span class="comment">// condition: 容器状态，这里选择等待直到容器运行结束</span></span><br><span class="line">	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)</span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> err := &lt;-errCh:</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="built_in">panic</span>(err)</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">case</span> &lt;-statusCh:</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取刚刚创建的容器的日志，该api在下文有介绍</span></span><br><span class="line">	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions&#123;ShowStdout: <span class="literal">true</span>&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">	stdcopy.StdCopy(os.Stdout, os.Stderr, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h5 id="后台运行容器">* 后台运行容器</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker run <span class="literal">-d</span> bfirsh/reticulate<span class="literal">-splines</span></span><br></pre></td></tr></table></figure></div>
-<p>没有使用<strong>ContainerWait</strong>则说明在后台使用容器，不等待容器的状态直接结束程序，其余与上文相同。</p>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types/container&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	imageName := <span class="string">&quot;bfirsh/reticulate-splines&quot;</span></span><br><span class="line"></span><br><span class="line">	out, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	io.Copy(os.Stdout, out)</span><br><span class="line"></span><br><span class="line">	resp, err := cli.ContainerCreate(ctx, &amp;container.Config&#123;</span><br><span class="line">		Image: imageName,</span><br><span class="line">	&#125;, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions&#123;&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(resp.ID)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h5 id="查看容器列表">2. 查看容器列表</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker <span class="built_in">ps</span></span><br></pre></td></tr></table></figure></div>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)</span></span><br><span class="line">    <span class="comment">// ContainerList: 查看容器列表的api</span></span><br><span class="line">    <span class="comment">// options: 查看容器列表的选项</span></span><br><span class="line">    <span class="comment">// containers: 容器列表结构体，包含ID、镜像、挂载卷等信息</span></span><br><span class="line">	containers, err := cli.ContainerList(ctx, types.ContainerListOptions&#123;</span><br><span class="line">        <span class="comment">// All:true  如果添加该项，则等价于docker ps -a，即查看所有容器列表</span></span><br><span class="line">    &#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里仅打印容器ID，根据需要可灵活选择</span></span><br><span class="line">	<span class="keyword">for</span> _, container := <span class="keyword">range</span> containers &#123;</span><br><span class="line">		fmt.Println(container.ID)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h5 id="停止所有运行中的容器生产环境下禁用">3.
-停止所有运行中的容器(生产环境下禁用)</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker stop <span class="variable">$</span>(docker <span class="built_in">ps</span> <span class="literal">-a</span> <span class="literal">-q</span>)</span><br></pre></td></tr></table></figure></div>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	containers, err := cli.ContainerList(ctx, types.ContainerListOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取镜像列表后通过循环关闭每个容器</span></span><br><span class="line">	<span class="keyword">for</span> _, container := <span class="keyword">range</span> containers &#123;</span><br><span class="line">		fmt.Print(<span class="string">&quot;Stopping container &quot;</span>, container.ID[:<span class="number">10</span>], <span class="string">&quot;... &quot;</span>)</span><br><span class="line">        <span class="comment">// ContainerStop(ctx context.Context, containerID string, timeout *time.Duration) error</span></span><br><span class="line">        <span class="comment">// 根据containerID关闭容器</span></span><br><span class="line">        <span class="comment">// timeout: 如果容器无法关闭，那么会在timeout指定的时间过后强制kill，nil表示如果无法关闭则保留容器</span></span><br><span class="line">		<span class="keyword">if</span> err := cli.ContainerStop(ctx, container.ID, <span class="literal">nil</span>); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="built_in">panic</span>(err)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Println(<span class="string">&quot;Success&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h5 id="获取指定容器的日志">4. 获取指定容器的日志</h5>
-<p>通过指定容器的ID，我们可以获取对应ID的容器的日志</p>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	options := types.ContainerLogsOptions&#123;ShowStdout: <span class="literal">true</span>&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error): 通过容器ID获取容器日志</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// containerID: 容器ID，这里选择刚刚创建容器ID</span></span><br><span class="line">    <span class="comment">// options: 查看日志选项，这里选择在控制台标准输出</span></span><br><span class="line">	out, err := cli.ContainerLogs(ctx, <span class="string">&quot;f1064a8a4c82&quot;</span>, options)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	io.Copy(os.Stdout, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h5 id="查看镜像列表">5. 查看镜像列表</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 相当于如下命令</span></span><br><span class="line">docker images</span><br></pre></td></tr></table></figure></div>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// ImageList(ctx context.Context, options types.ImageListOptions) ([]types.ImageSummary, error)</span></span><br><span class="line">    <span class="comment">// ImageList: 查看镜像列表的api</span></span><br><span class="line">    <span class="comment">// options: 查看镜像列表的选项</span></span><br><span class="line">    <span class="comment">// images: 镜像列表结构体，包含ID、创建时间等信息</span></span><br><span class="line">	images, err := cli.ImageList(ctx, types.ImageListOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 此处仅打印镜像id</span></span><br><span class="line">	<span class="keyword">for</span> _, image := <span class="keyword">range</span> images &#123;</span><br><span class="line">		fmt.Println(image.ID)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h5 id="拉取镜像">6. 拉取镜像</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 相当于如下命令</span></span><br><span class="line">docker pull alpine</span><br></pre></td></tr></table></figure></div>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) (io.ReadCloser, error)</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// refStr: 拉取的目标镜像名，这里拉取的镜像名称为&quot;alpine&quot;</span></span><br><span class="line">    <span class="comment">// options: 拉取镜像时的选择，这里没有额外选择</span></span><br><span class="line">	out, err := cli.ImagePull(ctx, <span class="string">&quot;alpine&quot;</span>, types.ImagePullOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">defer</span> out.Close()</span><br><span class="line"></span><br><span class="line">	io.Copy(os.Stdout, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h5 id="拉取私有镜像">* 拉取私有镜像</h5>
-<p>除了公开镜像，平时可能还会用到一些私有镜像，可以是DockerHub
-上私有镜像，也可以是自托管的镜像仓库。这时需要提供对应的凭证才可以拉取镜像</p>
-<blockquote>
-<p><strong>在使用 Docker API 的 Go SDK
-时，凭证是以明文的方式进行传输的，所以如果是自建的镜像仓库，请务必使用
-<code>HTTPS</code>！</strong></p>
-</blockquote>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;context&quot;</span></span><br><span class="line">    <span class="string">&quot;encoding/base64&quot;</span></span><br><span class="line">    <span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">    <span class="string">&quot;io&quot;</span></span><br><span class="line">    <span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    ctx := context.Background()</span><br><span class="line">    cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 登录凭证配置，在这里面填写账号密码</span></span><br><span class="line">    authConfig := types.AuthConfig&#123;</span><br><span class="line">        Username: <span class="string">&quot;username&quot;</span>,</span><br><span class="line">        Password: <span class="string">&quot;password&quot;</span>,</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 编码为JSON格式</span></span><br><span class="line">    encodedJSON, err := json.Marshal(authConfig)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 加密为BASE64编码</span></span><br><span class="line">    authStr := base64.URLEncoding.EncodeToString(encodedJSON)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在types.ImagePullOptions中设置登录凭证</span></span><br><span class="line">    out, err := cli.ImagePull(ctx, <span class="string">&quot;alpine&quot;</span>, types.ImagePullOptions&#123;RegistryAuth: authStr&#125;)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">defer</span> out.Close()</span><br><span class="line">    io.Copy(os.Stdout, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h5 id="保存容器为镜像">7. 保存容器为镜像</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types/container&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	createResp, err := cli.ContainerCreate(ctx, &amp;container.Config&#123;</span><br><span class="line">		Image: <span class="string">&quot;alpine&quot;</span>,</span><br><span class="line">		Cmd:   []<span class="type">string</span>&#123;<span class="string">&quot;touch&quot;</span>, <span class="string">&quot;/helloworld&quot;</span>&#125;,</span><br><span class="line">	&#125;, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := cli.ContainerStart(ctx, createResp.ID, types.ContainerStartOptions&#123;&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	statusCh, errCh := cli.ContainerWait(ctx, createResp.ID, container.WaitConditionNotRunning)</span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> err := &lt;-errCh:</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="built_in">panic</span>(err)</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">case</span> &lt;-statusCh:</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerCommit(ctx context.Context, container string, options types.ContainerCommitOptions) (types.IDResponse, error): 将一个容器保存为镜像</span></span><br><span class="line">    <span class="comment">// options: commit时附带的选项，这里设置Reference为&quot;helloworld&quot;</span></span><br><span class="line">	commitResp, err := cli.ContainerCommit(ctx, createResp.ID, types.ContainerCommitOptions&#123;Reference: <span class="string">&quot;helloworld&quot;</span>&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(commitResp.ID)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h5 id="dockerfile构建镜像">8. Dockerfile构建镜像</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;archive/tar&quot;</span></span><br><span class="line">	<span class="string">&quot;bytes&quot;</span></span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;io/ioutil&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line"></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将Dockerfile转化为流</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">createDockerTarFile</span><span class="params">(dockerfile <span class="type">string</span>)</span></span> (io.Reader, <span class="type">error</span>) &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> buf bytes.Buffer</span><br><span class="line">	tw := tar.NewWriter(&amp;buf)</span><br><span class="line">	f, err := os.Open(dockerfile)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> f.Close()</span><br><span class="line"></span><br><span class="line">	body, err := ioutil.ReadAll(f)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	hdr := &amp;tar.Header&#123;</span><br><span class="line">		Name: f.Name(),</span><br><span class="line">		Mode: <span class="number">0600</span>,</span><br><span class="line">		Size: <span class="type">int64</span>(<span class="built_in">len</span>(body)),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	tw.WriteHeader(hdr)</span><br><span class="line">	_,err = tw.Write(body)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> &amp;buf, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 利用cli.ImageBuild构建镜像</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BuildImage</span><span class="params">(cli *client.Client, dockerfile, project, imageName <span class="type">string</span>,tagVersion <span class="type">string</span>)</span></span> <span class="type">error</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将Dockerfile转化为流</span></span><br><span class="line">	dockerBuildContext, err := createDockerTarFile(dockerfile)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 读取镜像名和镜像版本</span></span><br><span class="line">	tags := fmt.Sprintf(<span class="string">&quot;%s:%s&quot;</span>,imageName, tagVersion)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 指定镜像构建选项</span></span><br><span class="line">	buildOptions := types.ImageBuildOptions&#123;</span><br><span class="line">		Dockerfile: <span class="string">&quot;Dockerfile&quot;</span>,  <span class="comment">// 可选，&quot;Dockerfile&quot;为默认值</span></span><br><span class="line">		Tags:       []<span class="type">string</span>&#123;tags&#125;,</span><br><span class="line">		Labels: <span class="keyword">map</span>[<span class="type">string</span>]<span class="type">string</span>&#123;</span><br><span class="line">			project: <span class="string">&quot;project&quot;</span>,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用Dockerfile字节流和buildOptions构建容器</span></span><br><span class="line">	output, err := cli.ImageBuild(context.Background(), dockerBuildContext, buildOptions)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 以下皆为后处理</span></span><br><span class="line">	body, err := ioutil.ReadAll(output.Body)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;Build resource image output: %v\n&quot;</span>, <span class="type">string</span>(body))</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> strings.Contains(<span class="type">string</span>(body), <span class="string">&quot;error&quot;</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;build image to docker error&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 指定Dockerfile名称，标签，镜像名和镜像版本来构建镜像</span></span><br><span class="line">	err = BuildImage(cli, <span class="string">&quot;Dockerfile&quot;</span>, <span class="string">&quot;test&quot;</span>, <span class="string">&quot;nginx&quot;</span>,<span class="string">&quot;latest&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-<h5 id="其他少用的操作删除等">9. 其他少用的操作(删除等)</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// docker rm d55d5e104495</span></span><br><span class="line">err := cli.ContainerRemove(ctx, <span class="string">&quot;d55d5e104495&quot;</span>, types.ContainerRemoveOptions&#123;&#125;)</span><br><span class="line"><span class="comment">// docker rmi d7d3d98c851f</span></span><br><span class="line">item, err := cli.ImageRemove(ctx, <span class="string">&quot;d55d5e104495&quot;</span>, types.ImageRemoveOptions&#123;&#125;)</span><br></pre></td></tr></table></figure></div>
-<h4 id="三管理远程docker">三、管理远程Docker</h4>
-<p>除了可以管理本地的 Docker， 我们同样也可以通过使用 Golang + Docker
-API 管理远程的 Docker。</p>
-<h5 id="远程连接">1. 远程连接</h5>
-<p>默认 Docker 是通过非网络的 Unix
-套接字运行的，只能够进行本地通信（<code>/var/run/docker.sock</code>），是不能够直接远程连接
-Docker 的。</p>
-<p>需要编辑配置文件
-<code>/etc/docker/daemon.json</code>，并修改以下内容（把
-<code>192.168.59.3</code> 改为远程docker的 IP 地址），然后重启
-Docker</p>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JSON"><figure class="iseeu highlight /json"><table><tr><td class="code"><pre><span class="line"># vi /etc/docker/daemon.json</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;hosts&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;tcp://192.168.59.3:2375&quot;</span><span class="punctuation">,</span>   </span><br><span class="line">    <span class="string">&quot;unix:///var/run/docker.sock&quot;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"># 修改后重启容器</span><br><span class="line">systemctl restart docker</span><br></pre></td></tr></table></figure></div>
-<h5 id="修改client">2. 修改client</h5>
-<p>创建 <code>client</code> 的时候需要指定远程 Docker
-的地址，这样就可以像管理本地 Docker 一样管理远程的 Docker 了</p>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line">cli, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation(),</span><br><span class="line">    client.WithHost(<span class="string">&quot;tcp://192.168.59.3:2375&quot;</span>))</span><br></pre></td></tr></table></figure></div>
-]]></content>
-  </entry>
-  <entry>
     <title>Decorator——装饰器</title>
     <url>/2022/05/05/Decorator/</url>
     <content><![CDATA[<h3 id="background">Background</h3>
@@ -513,6 +380,171 @@ Factory：抽象工厂模式</h4>
       </tags>
   </entry>
   <entry>
+    <title>Docker SDK for Golang</title>
+    <url>/2022/07/20/Docker%20SDK%20for%20Golang/</url>
+    <content><![CDATA[<p>Docker官方提供了一套Go语言的SDK，让开发者能够以进行Docker应用程序的构建和扩展</p>
+<h4 id="一安装sdks">一、安装SDKs</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line">go get github.com/docker/docker/client</span><br></pre></td></tr></table></figure></div>
+<h4 id="二管理本地的docker">二、管理本地的Docker</h4>
+<p>使用SDK之前需要<strong>取消勾选</strong>红框中的选项，否则会报<strong>2375端口占用</strong></p>
+<figure>
+<img src="/2022/07/20/Docker%20SDK%20for%20Golang/image-20220720151655652.png" alt="image-20220720151655652">
+<figcaption aria-hidden="true">image-20220720151655652</figcaption>
+</figure>
+<h5 id="docker-sdk总体流程">* docker sdk总体流程</h5>
+<p><img src="/2022/07/20/Docker%20SDK%20for%20Golang/docker.png" alt="docker" style="zoom:80%;"></p>
+<h5 id="docker-sdk和命令行对应关系">* docker sdk和命令行对应关系</h5>
+<table>
+<thead>
+<tr class="header">
+<th>SDK</th>
+<th>CMD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cli.ImagePull</td>
+<td>docker pull</td>
+</tr>
+<tr class="even">
+<td>cli.ContainerCreate</td>
+<td>docker create</td>
+</tr>
+<tr class="odd">
+<td>cli.ContainerStart</td>
+<td>docker start</td>
+</tr>
+<tr class="even">
+<td>cli.ContainerWait</td>
+<td>docker wait</td>
+</tr>
+<tr class="odd">
+<td>cli.ContainerLogs</td>
+<td>docker logs</td>
+</tr>
+<tr class="even">
+<td>cli.ContainerList</td>
+<td>docker ps</td>
+</tr>
+<tr class="odd">
+<td>cli.ContainerStop</td>
+<td>docker stop</td>
+</tr>
+<tr class="even">
+<td>cli.ImageList</td>
+<td>docker images</td>
+</tr>
+<tr class="odd">
+<td>cli.ContainerCommit</td>
+<td>docker commit</td>
+</tr>
+<tr class="even">
+<td>cli.ImageBuild</td>
+<td>docker build</td>
+</tr>
+<tr class="odd">
+<td>cli.ContainerRemove</td>
+<td>docker rm</td>
+</tr>
+<tr class="even">
+<td>cli.ImageRemove</td>
+<td>docker rmi</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>下面的代码行过长，建议开启全屏观看</strong></p>
+</blockquote>
+<h5 id="运行容器">1. 运行容器</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker run docker.io/library/alpine <span class="built_in">echo</span> <span class="string">&quot;hello world&quot;</span></span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types/container&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/pkg/stdcopy&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// context: goroutine运行时</span></span><br><span class="line">    <span class="comment">// context.Background(): 返回一个空的context</span></span><br><span class="line">	ctx := context.Background()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// NewClientWithOpts(ops ...Opt) (*Client, error): 根据选项配置新建一个client</span></span><br><span class="line">    <span class="comment">// 这里的选择是读取环境变量和api版本来新建对应的client(没有设置则为默认值)</span></span><br><span class="line">    <span class="comment">// cli: 通过client可以调用docker大部分的api</span></span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 拉取镜像&quot;docker.io/library/alpine&quot;，该api在下文有介绍</span></span><br><span class="line">	reader, err := cli.ImagePull(ctx, <span class="string">&quot;docker.io/library/alpine&quot;</span>, types.ImagePullOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	io.Copy(os.Stdout, reader)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ContainerCreate(ctx context.Context, config *container.Config, hostConfig *container.HostConfig, networkingConfig *network.NetworkingConfig, platform *specs.Platform, containerName string) (container.ContainerCreateCreatedBody, error): 创建容器</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// config: 容器配置，内容非常丰富，涵盖了Dockerfile的各种定义项，这里选择镜像为alpine，命令行输出&quot;hello world&quot;</span></span><br><span class="line">    <span class="comment">// hostConfig: 主机配置，这里设置为默认</span></span><br><span class="line">    <span class="comment">// networkingConfig: 网络配置，这里设置为默认</span></span><br><span class="line">    <span class="comment">// platform: 选择平台，这里设置为默认</span></span><br><span class="line">    <span class="comment">// containerName: 容器名称，这里设置为默认</span></span><br><span class="line">    <span class="comment">// resp: 返回的容器结构体，包含容器的各项信息</span></span><br><span class="line">	resp, err := cli.ContainerCreate(ctx, &amp;container.Config&#123;</span><br><span class="line">		Image: <span class="string">&quot;alpine&quot;</span>,</span><br><span class="line">		Cmd:   []<span class="type">string</span>&#123;<span class="string">&quot;echo&quot;</span>, <span class="string">&quot;hello world&quot;</span>&#125;,</span><br><span class="line">	&#125;, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerStart(ctx context.Context, containerID string, options types.ContainerStartOptions) error</span></span><br><span class="line">    <span class="comment">// 这是启动容器的api</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// containerID: 容器ID，这里选择刚刚创建容器ID</span></span><br><span class="line">    <span class="comment">// options: 容器启动方式，这里选择默认</span></span><br><span class="line">	<span class="keyword">if</span> err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions&#123;&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerWait(ctx context.Context, containerID string, condition container.WaitCondition) (&lt;-chan container.ContainerWaitOKBody, &lt;-chan error): 等待，直到容器处于某种状态后进行后续操作</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// containerID: 容器ID，这里选择刚刚创建容器ID</span></span><br><span class="line">    <span class="comment">// condition: 容器状态，这里选择等待直到容器运行结束</span></span><br><span class="line">	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)</span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> err := &lt;-errCh:</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="built_in">panic</span>(err)</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">case</span> &lt;-statusCh:</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取刚刚创建的容器的日志，该api在下文有介绍</span></span><br><span class="line">	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions&#123;ShowStdout: <span class="literal">true</span>&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">	stdcopy.StdCopy(os.Stdout, os.Stderr, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="后台运行容器">* 后台运行容器</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker run <span class="literal">-d</span> bfirsh/reticulate<span class="literal">-splines</span></span><br></pre></td></tr></table></figure></div>
+<p>没有使用<strong>ContainerWait</strong>则说明在后台使用容器，不等待容器的状态直接结束程序，其余与上文相同。</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types/container&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	imageName := <span class="string">&quot;bfirsh/reticulate-splines&quot;</span></span><br><span class="line"></span><br><span class="line">	out, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	io.Copy(os.Stdout, out)</span><br><span class="line"></span><br><span class="line">	resp, err := cli.ContainerCreate(ctx, &amp;container.Config&#123;</span><br><span class="line">		Image: imageName,</span><br><span class="line">	&#125;, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions&#123;&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(resp.ID)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="查看容器列表">2. 查看容器列表</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker <span class="built_in">ps</span></span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)</span></span><br><span class="line">    <span class="comment">// ContainerList: 查看容器列表的api</span></span><br><span class="line">    <span class="comment">// options: 查看容器列表的选项</span></span><br><span class="line">    <span class="comment">// containers: 容器列表结构体，包含ID、镜像、挂载卷等信息</span></span><br><span class="line">	containers, err := cli.ContainerList(ctx, types.ContainerListOptions&#123;</span><br><span class="line">        <span class="comment">// All:true  如果添加该项，则等价于docker ps -a，即查看所有容器列表</span></span><br><span class="line">    &#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里仅打印容器ID，根据需要可灵活选择</span></span><br><span class="line">	<span class="keyword">for</span> _, container := <span class="keyword">range</span> containers &#123;</span><br><span class="line">		fmt.Println(container.ID)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="停止所有运行中的容器生产环境下禁用">3.
+停止所有运行中的容器(生产环境下禁用)</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 等价于如下命令</span></span><br><span class="line">docker stop <span class="variable">$</span>(docker <span class="built_in">ps</span> <span class="literal">-a</span> <span class="literal">-q</span>)</span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	containers, err := cli.ContainerList(ctx, types.ContainerListOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取镜像列表后通过循环关闭每个容器</span></span><br><span class="line">	<span class="keyword">for</span> _, container := <span class="keyword">range</span> containers &#123;</span><br><span class="line">		fmt.Print(<span class="string">&quot;Stopping container &quot;</span>, container.ID[:<span class="number">10</span>], <span class="string">&quot;... &quot;</span>)</span><br><span class="line">        <span class="comment">// ContainerStop(ctx context.Context, containerID string, timeout *time.Duration) error</span></span><br><span class="line">        <span class="comment">// 根据containerID关闭容器</span></span><br><span class="line">        <span class="comment">// timeout: 如果容器无法关闭，那么会在timeout指定的时间过后强制kill，nil表示如果无法关闭则保留容器</span></span><br><span class="line">		<span class="keyword">if</span> err := cli.ContainerStop(ctx, container.ID, <span class="literal">nil</span>); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="built_in">panic</span>(err)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Println(<span class="string">&quot;Success&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="获取指定容器的日志">4. 获取指定容器的日志</h5>
+<p>通过指定容器的ID，我们可以获取对应ID的容器的日志</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	options := types.ContainerLogsOptions&#123;ShowStdout: <span class="literal">true</span>&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error): 通过容器ID获取容器日志</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// containerID: 容器ID，这里选择刚刚创建容器ID</span></span><br><span class="line">    <span class="comment">// options: 查看日志选项，这里选择在控制台标准输出</span></span><br><span class="line">	out, err := cli.ContainerLogs(ctx, <span class="string">&quot;f1064a8a4c82&quot;</span>, options)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	io.Copy(os.Stdout, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="查看镜像列表">5. 查看镜像列表</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 相当于如下命令</span></span><br><span class="line">docker images</span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// ImageList(ctx context.Context, options types.ImageListOptions) ([]types.ImageSummary, error)</span></span><br><span class="line">    <span class="comment">// ImageList: 查看镜像列表的api</span></span><br><span class="line">    <span class="comment">// options: 查看镜像列表的选项</span></span><br><span class="line">    <span class="comment">// images: 镜像列表结构体，包含ID、创建时间等信息</span></span><br><span class="line">	images, err := cli.ImageList(ctx, types.ImageListOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 此处仅打印镜像id</span></span><br><span class="line">	<span class="keyword">for</span> _, image := <span class="keyword">range</span> images &#123;</span><br><span class="line">		fmt.Println(image.ID)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="拉取镜像">6. 拉取镜像</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="POWERSHELL"><figure class="iseeu highlight /powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 相当于如下命令</span></span><br><span class="line">docker pull alpine</span><br></pre></td></tr></table></figure></div>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ImagePull(ctx context.Context, refStr string, options types.ImagePullOptions) (io.ReadCloser, error)</span></span><br><span class="line">    <span class="comment">// ctx: 第一行代码中创建的context</span></span><br><span class="line">    <span class="comment">// refStr: 拉取的目标镜像名，这里拉取的镜像名称为&quot;alpine&quot;</span></span><br><span class="line">    <span class="comment">// options: 拉取镜像时的选择，这里没有额外选择</span></span><br><span class="line">	out, err := cli.ImagePull(ctx, <span class="string">&quot;alpine&quot;</span>, types.ImagePullOptions&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">defer</span> out.Close()</span><br><span class="line"></span><br><span class="line">	io.Copy(os.Stdout, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="拉取私有镜像">* 拉取私有镜像</h5>
+<p>除了公开镜像，平时可能还会用到一些私有镜像，可以是DockerHub
+上私有镜像，也可以是自托管的镜像仓库。这时需要提供对应的凭证才可以拉取镜像</p>
+<blockquote>
+<p><strong>在使用 Docker API 的 Go SDK
+时，凭证是以明文的方式进行传输的，所以如果是自建的镜像仓库，请务必使用
+<code>HTTPS</code>！</strong></p>
+</blockquote>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;context&quot;</span></span><br><span class="line">    <span class="string">&quot;encoding/base64&quot;</span></span><br><span class="line">    <span class="string">&quot;encoding/json&quot;</span></span><br><span class="line">    <span class="string">&quot;io&quot;</span></span><br><span class="line">    <span class="string">&quot;os&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">    <span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    ctx := context.Background()</span><br><span class="line">    cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 登录凭证配置，在这里面填写账号密码</span></span><br><span class="line">    authConfig := types.AuthConfig&#123;</span><br><span class="line">        Username: <span class="string">&quot;username&quot;</span>,</span><br><span class="line">        Password: <span class="string">&quot;password&quot;</span>,</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 编码为JSON格式</span></span><br><span class="line">    encodedJSON, err := json.Marshal(authConfig)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 加密为BASE64编码</span></span><br><span class="line">    authStr := base64.URLEncoding.EncodeToString(encodedJSON)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在types.ImagePullOptions中设置登录凭证</span></span><br><span class="line">    out, err := cli.ImagePull(ctx, <span class="string">&quot;alpine&quot;</span>, types.ImagePullOptions&#123;RegistryAuth: authStr&#125;)</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="built_in">panic</span>(err)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">defer</span> out.Close()</span><br><span class="line">    io.Copy(os.Stdout, out)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="保存容器为镜像">7. 保存容器为镜像</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types/container&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx := context.Background()</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	createResp, err := cli.ContainerCreate(ctx, &amp;container.Config&#123;</span><br><span class="line">		Image: <span class="string">&quot;alpine&quot;</span>,</span><br><span class="line">		Cmd:   []<span class="type">string</span>&#123;<span class="string">&quot;touch&quot;</span>, <span class="string">&quot;/helloworld&quot;</span>&#125;,</span><br><span class="line">	&#125;, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="literal">nil</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> err := cli.ContainerStart(ctx, createResp.ID, types.ContainerStartOptions&#123;&#125;); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	statusCh, errCh := cli.ContainerWait(ctx, createResp.ID, container.WaitConditionNotRunning)</span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> err := &lt;-errCh:</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="built_in">panic</span>(err)</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">case</span> &lt;-statusCh:</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ContainerCommit(ctx context.Context, container string, options types.ContainerCommitOptions) (types.IDResponse, error): 将一个容器保存为镜像</span></span><br><span class="line">    <span class="comment">// options: commit时附带的选项，这里设置Reference为&quot;helloworld&quot;</span></span><br><span class="line">	commitResp, err := cli.ContainerCommit(ctx, createResp.ID, types.ContainerCommitOptions&#123;Reference: <span class="string">&quot;helloworld&quot;</span>&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(commitResp.ID)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h5 id="dockerfile构建镜像">8. Dockerfile构建镜像</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;archive/tar&quot;</span></span><br><span class="line">	<span class="string">&quot;bytes&quot;</span></span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;io/ioutil&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/api/types&quot;</span></span><br><span class="line">	<span class="string">&quot;github.com/docker/docker/client&quot;</span></span><br><span class="line"></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将Dockerfile转化为流</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">createDockerTarFile</span><span class="params">(dockerfile <span class="type">string</span>)</span></span> (io.Reader, <span class="type">error</span>) &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> buf bytes.Buffer</span><br><span class="line">	tw := tar.NewWriter(&amp;buf)</span><br><span class="line">	f, err := os.Open(dockerfile)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> f.Close()</span><br><span class="line"></span><br><span class="line">	body, err := ioutil.ReadAll(f)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	hdr := &amp;tar.Header&#123;</span><br><span class="line">		Name: f.Name(),</span><br><span class="line">		Mode: <span class="number">0600</span>,</span><br><span class="line">		Size: <span class="type">int64</span>(<span class="built_in">len</span>(body)),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	tw.WriteHeader(hdr)</span><br><span class="line">	_,err = tw.Write(body)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> &amp;buf, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 利用cli.ImageBuild构建镜像</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BuildImage</span><span class="params">(cli *client.Client, dockerfile, project, imageName <span class="type">string</span>,tagVersion <span class="type">string</span>)</span></span> <span class="type">error</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将Dockerfile转化为流</span></span><br><span class="line">	dockerBuildContext, err := createDockerTarFile(dockerfile)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 读取镜像名和镜像版本</span></span><br><span class="line">	tags := fmt.Sprintf(<span class="string">&quot;%s:%s&quot;</span>,imageName, tagVersion)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 指定镜像构建选项</span></span><br><span class="line">	buildOptions := types.ImageBuildOptions&#123;</span><br><span class="line">		Dockerfile: <span class="string">&quot;Dockerfile&quot;</span>,  <span class="comment">// 可选，&quot;Dockerfile&quot;为默认值</span></span><br><span class="line">		Tags:       []<span class="type">string</span>&#123;tags&#125;,</span><br><span class="line">		Labels: <span class="keyword">map</span>[<span class="type">string</span>]<span class="type">string</span>&#123;</span><br><span class="line">			project: <span class="string">&quot;project&quot;</span>,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用Dockerfile字节流和buildOptions构建容器</span></span><br><span class="line">	output, err := cli.ImageBuild(context.Background(), dockerBuildContext, buildOptions)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 以下皆为后处理</span></span><br><span class="line">	body, err := ioutil.ReadAll(output.Body)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;Build resource image output: %v\n&quot;</span>, <span class="type">string</span>(body))</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> strings.Contains(<span class="type">string</span>(body), <span class="string">&quot;error&quot;</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;build image to docker error&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	</span><br><span class="line">	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 指定Dockerfile名称，标签，镜像名和镜像版本来构建镜像</span></span><br><span class="line">	err = BuildImage(cli, <span class="string">&quot;Dockerfile&quot;</span>, <span class="string">&quot;test&quot;</span>, <span class="string">&quot;nginx&quot;</span>,<span class="string">&quot;latest&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<h5 id="其他少用的操作删除等">9. 其他少用的操作(删除等)</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// docker rm d55d5e104495</span></span><br><span class="line">err := cli.ContainerRemove(ctx, <span class="string">&quot;d55d5e104495&quot;</span>, types.ContainerRemoveOptions&#123;&#125;)</span><br><span class="line"><span class="comment">// docker rmi d7d3d98c851f</span></span><br><span class="line">item, err := cli.ImageRemove(ctx, <span class="string">&quot;d55d5e104495&quot;</span>, types.ImageRemoveOptions&#123;&#125;)</span><br></pre></td></tr></table></figure></div>
+<h4 id="三管理远程docker">三、管理远程Docker</h4>
+<p>除了可以管理本地的 Docker， 我们同样也可以通过使用 Golang + Docker
+API 管理远程的 Docker。</p>
+<h5 id="远程连接">1. 远程连接</h5>
+<p>默认 Docker 是通过非网络的 Unix
+套接字运行的，只能够进行本地通信（<code>/var/run/docker.sock</code>），是不能够直接远程连接
+Docker 的。</p>
+<p>需要编辑配置文件
+<code>/etc/docker/daemon.json</code>，并修改以下内容（把
+<code>192.168.59.3</code> 改为远程docker的 IP 地址），然后重启
+Docker</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JSON"><figure class="iseeu highlight /json"><table><tr><td class="code"><pre><span class="line"># vi /etc/docker/daemon.json</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;hosts&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;tcp://192.168.59.3:2375&quot;</span><span class="punctuation">,</span>   </span><br><span class="line">    <span class="string">&quot;unix:///var/run/docker.sock&quot;</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"># 修改后重启容器</span><br><span class="line">systemctl restart docker</span><br></pre></td></tr></table></figure></div>
+<h5 id="修改client">2. 修改client</h5>
+<p>创建 <code>client</code> 的时候需要指定远程 Docker
+的地址，这样就可以像管理本地 Docker 一样管理远程的 Docker 了</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="GO"><figure class="iseeu highlight /go"><table><tr><td class="code"><pre><span class="line">cli, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation(),</span><br><span class="line">    client.WithHost(<span class="string">&quot;tcp://192.168.59.3:2375&quot;</span>))</span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据挖掘模型——ExtraTree</title>
+    <url>/2022/05/25/ExtraTree/</url>
+    <content><![CDATA[<blockquote>
+<p>参考资料：</p>
+<p><a href="https://scikit-learn.org/stable/modules/ensemble.html#extremely-randomized-trees">sklearn.org</a></p>
+<p><a href="https://blog.csdn.net/dili8870/article/details/101506670">模型融合---ExtraTree（极限树）总结</a></p>
+</blockquote>
+<h4 id="一什么是extratree">一、什么是ExtraTree</h4>
+<p>ExtraTree(极限树)和随机森林算法十分相似，都是由许多决策树构成。极限树与随机森林的主要区别在于：</p>
+<ul>
+<li>随机森林应用<strong>Bagging模型</strong>，extraTree使用<strong>所有的样本(不随机采样)</strong>，且特征随机选取，在某种程度上比随机森林得到的结果更好。</li>
+<li>随机森林在<strong>随机子集</strong>内得到最佳分叉属性，ET是<strong>完全随机</strong>得到分叉值。</li>
+</ul>
+<p>因此ExtraTree又称为Extremely Randomized
+Trees(极度随机化的树)，有点是能够进一步减少模型的方差，提高预测的稳定性，代价是偏差稍微增加，预测能力略微下降。</p>
+<blockquote>
+<p>对ExtraTree的了解非常有限，b站上没有任何一个专门的视频讲解ExtraTree</p>
+<p>总结一句话：如果需要稳定的预测，则使用极限树；如果需要更强的预测能力，则使用随机森林</p>
+</blockquote>
+<h4 id="二使用方法">二、使用方法</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="PYTHON"><figure class="iseeu highlight /python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> ExtraTreesClassifier</span><br><span class="line">clf = ExtraTreesClassifier(n_estimators=<span class="number">10</span>, max_depth=<span class="literal">None</span>,min_samples_split=<span class="number">2</span>, random_state=<span class="number">0</span>)</span><br><span class="line"><span class="comment"># 五则交叉验证</span></span><br><span class="line">scores = cross_val_score(clf, X, y, cv=<span class="number">5</span>)</span><br></pre></td></tr></table></figure></div>
+<p>主要参数是<code>n_estimators</code>和
+<code>max_features</code>，前者是森林中树的数量，默认值100；后者是寻找最佳分割是要考虑的特征数量。</p>
+]]></content>
+      <tags>
+        <tag>数据挖掘</tag>
+        <tag>机器学习</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>数据挖掘模型——GBDT</title>
     <url>/2022/05/25/GBDT/</url>
     <content><![CDATA[<blockquote>
@@ -613,59 +645,6 @@ Tree的缩写，特指一种以二叉树为逻辑结构的，用于完成线性�
       <tags>
         <tag>软件测试</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>数据挖掘模型——ExtraTree</title>
-    <url>/2022/05/25/ExtraTree/</url>
-    <content><![CDATA[<blockquote>
-<p>参考资料：</p>
-<p><a href="https://scikit-learn.org/stable/modules/ensemble.html#extremely-randomized-trees">sklearn.org</a></p>
-<p><a href="https://blog.csdn.net/dili8870/article/details/101506670">模型融合---ExtraTree（极限树）总结</a></p>
-</blockquote>
-<h4 id="一什么是extratree">一、什么是ExtraTree</h4>
-<p>ExtraTree(极限树)和随机森林算法十分相似，都是由许多决策树构成。极限树与随机森林的主要区别在于：</p>
-<ul>
-<li>随机森林应用<strong>Bagging模型</strong>，extraTree使用<strong>所有的样本(不随机采样)</strong>，且特征随机选取，在某种程度上比随机森林得到的结果更好。</li>
-<li>随机森林在<strong>随机子集</strong>内得到最佳分叉属性，ET是<strong>完全随机</strong>得到分叉值。</li>
-</ul>
-<p>因此ExtraTree又称为Extremely Randomized
-Trees(极度随机化的树)，有点是能够进一步减少模型的方差，提高预测的稳定性，代价是偏差稍微增加，预测能力略微下降。</p>
-<blockquote>
-<p>对ExtraTree的了解非常有限，b站上没有任何一个专门的视频讲解ExtraTree</p>
-<p>总结一句话：如果需要稳定的预测，则使用极限树；如果需要更强的预测能力，则使用随机森林</p>
-</blockquote>
-<h4 id="二使用方法">二、使用方法</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="PYTHON"><figure class="iseeu highlight /python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> ExtraTreesClassifier</span><br><span class="line">clf = ExtraTreesClassifier(n_estimators=<span class="number">10</span>, max_depth=<span class="literal">None</span>,min_samples_split=<span class="number">2</span>, random_state=<span class="number">0</span>)</span><br><span class="line"><span class="comment"># 五则交叉验证</span></span><br><span class="line">scores = cross_val_score(clf, X, y, cv=<span class="number">5</span>)</span><br></pre></td></tr></table></figure></div>
-<p>主要参数是<code>n_estimators</code>和
-<code>max_features</code>，前者是森林中树的数量，默认值100；后者是寻找最佳分割是要考虑的特征数量。</p>
-]]></content>
-      <tags>
-        <tag>数据挖掘</tag>
-        <tag>机器学习</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2022/04/29/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very
-first post. Check <a href="https://hexo.io/docs/">documentation</a> for
-more info. If you get any problems when using Hexo, you can find the
-answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or
-you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="quick-start">Quick Start</h2>
-<h3 id="create-a-new-post">Create a new post</h3>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure></div>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="run-server">Run server</h3>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure></div>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="generate-static-files">Generate static files</h3>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure></div>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure></div>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
   </entry>
   <entry>
     <title>LoadRunner的基本使用</title>
@@ -987,266 +966,6 @@ Results(关联结果)：脚本需要关联时，回放脚本的过程中记录�
       </tags>
   </entry>
   <entry>
-    <title>Linux三剑客之awk</title>
-    <url>/2022/05/18/awk/</url>
-    <content><![CDATA[<h3 id="简介">1. 简介</h3>
-<p>awk是一门<strong>编程语言</strong>，主要应用领域为数据<strong>过滤、统计和计算</strong>，在系统中通常用来处理日志数据。</p>
-<p>使用命令 <code>man awk</code> 查看awk的详细信息</p>
-<h3 id="执行过程">2. 执行过程</h3>
-<h4 id="示例代码">2.1 示例代码</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">BEGIN&#123;<span class="built_in">print</span> <span class="string">&quot;name&quot;</span>&#125; 打印<span class="string">&#x27;name&#x27;</span>字符串</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">&#123;<span class="built_in">print</span> <span class="variable">$2</span>&#125; 打印每一行的第二列，前面可以加上条件</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">END&#123;<span class="built_in">print</span> <span class="string">&quot;end of file&quot;</span>&#125; 打印EOF</span></span><br><span class="line">awk -F, &#x27;BEGIN&#123;print &quot;name&quot;&#125;&#123;print $2&#125;END&#123;print &quot;end of file&quot;&#125;&#x27; test.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">带条件的awk命令，指定打印第二行第二列内容</span></span><br><span class="line">awk -F, &#x27;BEGIN&#123;print &quot;name&quot;&#125;NR==2&#123;print $2&#125;END&#123;print &quot;end of file&quot;&#125;&#x27; test.txt</span><br></pre></td></tr></table></figure></div>
-<h4 id="流程">2.2 流程</h4>
-<p><strong>读取文件之前</strong>：进行命令行赋值或设置命令行参数，并运行BEGIN{}方法体</p>
-<p><strong>读取文件过程</strong>：读取文件内容 <span class="math inline">\(\rightarrow\)</span> 判断是否满足结束条件 <span class="math inline">\(\rightarrow\)</span> 不满足则继续读取下一行 <span class="math inline">\(\rightarrow\)</span> EOF</p>
-<p><strong>读取文件之后</strong>：运行END{}方法体</p>
-<h3 id="常用操作">3. 常用操作</h3>
-<h4 id="行和列">3.1 行和列</h4>
-<p><strong>行</strong>：在awk中称为记录(record)，每一行默认通过回车分割</p>
-<p><strong>列</strong>：在awk中称为字段/域(field)，每一列默认通过空格分割</p>
-<blockquote>
-<p>awk中的行列结束标记都可以修改</p>
-</blockquote>
-<h5 id="取行">3.1.1 取行</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">NR：行号</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">符号包括 &gt; &lt; &lt;= &gt;= == !=</span></span><br><span class="line">NR == 1 # 取出第一行</span><br><span class="line">NR &gt;= 1 &amp;&amp; NR &lt;= 5 # 取出1~5行</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">直接索引</span></span><br><span class="line">awk &#x27;/kjournald/&#x27; test.txt # 取出所有带有&#x27;kjournald&#x27;记录</span><br></pre></td></tr></table></figure></div>
-<h5 id="取列">3.1.2 取列</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-F 指定分隔符(默认为空格/连续的空格/tab键)</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="variable">$1</span> 取出第1列</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="variable">$0</span> 表示整行的内容</span></span><br><span class="line">awk &#x27;&#123;print $6&#125;&#x27; test.txt # 取出第6列的全部内容</span><br><span class="line">awk NR==2&#x27;&#123;print $0&#125;&#x27; test.txt # 取出第2行的全部内容</span><br><span class="line">awk &#x27;&#123;print $1,$2&#125;&#x27; test.txt # 取出第1列和第2列的全部内容</span><br><span class="line">awk &#x27;&#123;print $1,$3,$5&#125;&#x27; test.txt |column -t # 取出第1,3,5列的全部内容，并进行对齐</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">NF：每行有多少字段</span></span><br><span class="line">awk &#x27;&#123;print $NF&#125;&#x27; test.txt # 取最后一列</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">结果间可以自定义分隔符</span></span><br><span class="line">awk &#x27;&#123;print $1 &quot;@&quot; $3&#125;&#x27; test.txt # 取出第1,3列，并以@分割</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">OFS: OutPut Field Separator，输出时的分隔符，默认为空格</span></span><br><span class="line">awk -F: -vOFS=: &#x27;&#123;print $NF,$2,$3,$4,$5,$6,$1&#125;&#x27; test.txt # 输出时默认以:分割</span><br></pre></td></tr></table></figure></div>
-<h4 id="awk模式匹配">3.2 awk模式匹配</h4>
-<p>了解awk的条件有哪些情况：</p>
-<ul>
-<li>比较符号： &gt; &lt; &gt;= &lt;= == !=</li>
-<li>正则表达式</li>
-<li>范围表达式</li>
-<li>特殊条件：BEGIN{} END{}</li>
-</ul>
-<h5 id="比较表达式">3.2.1 比较表达式</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line">awk &#x27;NR&gt;=1 &amp;&amp; NR &lt;=3&#x27; test.txt</span><br></pre></td></tr></table></figure></div>
-<h5 id="正则">3.2.2 正则</h5>
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: center;">正则</th>
-<th style="text-align: center;">awk正则</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">^ 表示以...开头的行</td>
-<td style="text-align: center;">某一列的开头</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">$ 表示以...结尾的行</td>
-<td style="text-align: center;">某一列的结尾</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">^$表示空行</td>
-<td style="text-align: center;">某一列的空(少用)</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>支持扩展正则</li>
-<li>awk的正则可以精确到行，指定包含或不包含指定内容</li>
-<li>~包含</li>
-<li>!~不包含</li>
-</ul>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出第3列以1开头的行</span></span><br><span class="line">awk -F: &#x27;$3~/^1/&#x27; /etc/passwd</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找到第3列以2开头的行，并显示第1列，第3列和最后一列</span></span><br><span class="line">awk -F: &#x27;$3~/^2/&#123;print $1,$3,$NF&#125;&#x27; /etc/passwd</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找到第3列以1或2开头的行</span></span><br><span class="line">awk -F: &#x27;$3~/^[12]/&#123;print $1,$3,$NF&#125;&#x27; /etc/passwd</span><br></pre></td></tr></table></figure></div>
-<h5 id="范围表达式">3.2.3 范围表达式</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/哪里开始/,/哪里结束/ (最常用的语法)</span></span><br><span class="line">awk &#x27;/11:02:00/,/11:02:30/&#123;print $1&#125;&#x27; access.log # 打印30秒内日志的第一行</span><br></pre></td></tr></table></figure></div>
-<h5 id="特殊模式begin和end">3.2.3 特殊模式BEGIN{}和END</h5>
-<p><strong>BEGIN{}</strong>：awk读取文件前执行，用于：</p>
-<ul>
-<li>进行简单统计/计算，</li>
-<li>添加表头</li>
-<li>用来定义awk变量(少用，一般用-v)</li>
-</ul>
-<p><strong>END{}</strong>：awk读取文件后执行，用于：</p>
-<ul>
-<li>进行统计，输入计算结果</li>
-<li>awk使用数组，用来输出数组的结果</li>
-</ul>
-<table>
-<thead>
-<tr class="header">
-<th>统计方法</th>
-<th>简写形式</th>
-<th>应用场景</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>i = i + 1</td>
-<td>i++</td>
-<td>计数</td>
-</tr>
-<tr class="even">
-<td>sum = sum + ?</td>
-<td>sum += ?</td>
-<td>求和</td>
-</tr>
-<tr class="odd">
-<td>array[] = array[] + 1</td>
-<td>array[]++</td>
-<td>数组分类计数</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>sum和i都是<strong>变量</strong></p>
-</blockquote>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">统计 /etc/services里有多少个空行</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">i++ 每行进行统计 | <span class="built_in">print</span> i 输出结果</span> </span><br><span class="line">awk &#x27;/^$/&#123;i++&#125;END&#123;print i&#125;&#x27; /etc/services</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">计算1+2+3+...+100</span></span><br><span class="line">seq 100|awk &#x27;&#123;sum += $1&#125;END&#123;print sum&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看过程</span></span><br><span class="line">seq 100|awk &#x27;&#123;sum += $1;print sum&#125;END&#123;print sum&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
-<h4 id="awk数组">3.3 awk数组</h4>
-<ul>
-<li>统计日志：统计每个ip出现次数，统计每种状态码的出现次数，统计攻击者ip出现次数</li>
-<li>统计每个ip消耗的流量</li>
-</ul>
-<table>
-<colgroup>
-<col style="width: 5%">
-<col style="width: 55%">
-<col style="width: 38%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: center;"></th>
-<th>shell数组</th>
-<th>awk数组</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">形式</td>
-<td>array[0] = token1 array[1] = token2</td>
-<td>array[0] = token1 array[1] = token2</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">使用</td>
-<td>echo ${array[0]} $(array[1]}</td>
-<td>print array[0] array[1]</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">批处理</td>
-<td>for i in ${array[*]} <br>do <br> echo $i<br>done</td>
-<td>for(i in array)<br> print array[i]</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">错误写法：awk中所有字母都被识别为变量，字符串需要使用双引号围绕</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=token1;a[1]=token2;print a[0],a[1]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">正确写法</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=&quot;token1&quot;;a[1]=&quot;token2&quot;;print a[0],a[1]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">批处理</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=&quot;token1&quot;;a[1]=&quot;token2&quot;;for(i in a) print a[i]&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
-<h5 id="范例一">范例一</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">处理以下文件内容，取出域名并进行计数和排序处理</span></span><br><span class="line">http://www.etiantian.org/index.html</span><br><span class="line">http://www.etiantian.org/index.html</span><br><span class="line">http://post.etiantian.org/index.html</span><br><span class="line">http://mp3.etiantian.org/index.html</span><br><span class="line">http://www.etiantian.org/3.html</span><br><span class="line">http://post.etiantian.org/2.html</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">需要计算</span></span><br><span class="line">www.etiantian.org 出现次数</span><br><span class="line">post.etiantian.org 出现次数</span><br><span class="line">mp3.etiantian.org 出现次数</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">代码</span></span><br><span class="line">awk -F/ &#x27;&#123;array[$3]++&#125;END&#123;for(i in array) print i,array[i]&#125;&#x27; test.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出结果</span></span><br><span class="line">mp3.etiantian.org 1</span><br><span class="line">www.etiantian.org 3</span><br><span class="line">post.etiantian.org 2</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">排序</span></span><br><span class="line">awk -F/ &#x27;&#123;array[$3]++&#125;END&#123;for(i in array) print i,array[i]&#125;&#x27; test.txt|sort -rnk2</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出结果</span></span><br><span class="line">www.etiantian.org 3</span><br><span class="line">post.etiantian.org 2</span><br><span class="line">mp3.etiantian.org 1</span><br></pre></td></tr></table></figure></div>
-<h4 id="awk循环和判断">3.4 awk循环和判断</h4>
-<h5 id="for循环">3.4.1 for循环</h5>
-<table>
-<colgroup>
-<col style="width: 56%">
-<col style="width: 43%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>shell的c语言for循环</th>
-<th>awk的for循环</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>for((i = 1; i &lt;= 10; i++)) <br>do<br> echo $n<br>done</td>
-<td>for(int i = 1; i &lt;= 10; i++)<br> print i</td>
-</tr>
-</tbody>
-</table>
-<p><div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line">awk &#x27;BEGIN&#123;</span><br><span class="line">for(i=1;i&lt;=100;i++)</span><br><span class="line">	sum+=i; </span><br><span class="line">	print sum;</span><br><span class="line">&#125;&#x27;</span><br></pre></td></tr></table></figure></div></p>
-<h5 id="if判断">3.4.2 if判断</h5>
-<table>
-<colgroup>
-<col style="width: 50%">
-<col style="width: 49%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>shell if判断</th>
-<th>awk if判断</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>if["token -eq 18"]; then <br> echo take to do sth<br>else<br>
-echo "rest"<br>pass</td>
-<td>if(condition)<br> print sth<br>else<br> print other</td>
-</tr>
-</tbody>
-</table>
-<h5 id="范例2">范例2</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">统计这段语句中，单词中字符数小于6的单词，并显示</span></span><br><span class="line">echo I am a student studing in XMU university</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">代码 length(<span class="variable">$i</span>) 统计第i列的长度</span></span><br><span class="line">echo I am a student studing in XMU university. |awk &#x27;&#123;for(i=1;i&lt;=NF;i++)&#123;if(length($i) &lt;6) print $i&#125;&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
-<h3 id="awk总结">4. awk总结</h3>
-<ul>
-<li><p>awk选项 -F -v</p></li>
-<li><p>awk执行流程</p></li>
-<li><p>awk取行取列</p></li>
-<li><p>awk模式：正则、范围、特殊模式</p></li>
-<li><p>awk数组</p></li>
-<li><p>awk控制：for / if</p></li>
-<li><p>awk帮助：man awk / info awk</p></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数学公式速查</title>
-    <url>/2022/08/10/%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E9%80%9F%E6%9F%A5/</url>
-    <content><![CDATA[<h4 id="一泰勒公式">一、泰勒公式</h4>
-<h5 id="带拉格朗日余项的n阶泰勒公式">1. 带拉格朗日余项的n阶泰勒公式</h5>
-<p>$f(x) = f(x_0) + f(x_0)'(x-x_0)+(x-x_0)<sup>2+...+(x-x_0)</sup>n
-+(x-x_0)^{n+1},介于x和x_0之间 $</p>
-<h5 id="带佩亚诺余项的n阶泰勒公式">2. 带佩亚诺余项的n阶泰勒公式</h5>
-<p><span class="math inline">\(f(x) = f(x_0) +
-f(x_0)&#39;(x-x_0)+\frac{f(x_0)&#39;&#39;}{2!}(x-x_0)^2+...+\frac{f(x_0){}^{(n)}}{n!}(x-x_0)^n
-+o((x-x_0)^n)\)</span></p>
-<h5 id="常见的低阶泰勒公式">3. 常见的低阶泰勒公式</h5>
-<p>$sinx = x - x<sup>3+o(x</sup>3) $ $arcsinx = x + x<sup>3+o(x</sup>3)
-$</p>
-<p><span class="math inline">\(tanx = x + \frac{1}{3}x^3+o(x^3)\)</span>
-$arctanx = x - x<sup>3+o(x</sup>3) $</p>
-<p>$cosx = 1 - x^2 + x^4 + o(x^4) $ <span class="math inline">\(e^x = 1
-+ x + \frac{x^2}{2!} + \frac{x^3}{3!} + o(x^3)\)</span></p>
-<p><span class="math inline">\(ln(1+x) = x - \frac{x^2}{2} +
-\frac{x^3}{3} + o(x^3)\)</span> $(1+x)^m = 1 + mx + x^2 + o(x^2) $</p>
-<h4 id="二等价无穷小">二、等价无穷小</h4>
-<p>当<span class="math inline">\(x \rightarrow 0\)</span>时，有</p>
-<p><span class="math inline">\(sinx \sim arcsinx \sim tanx \sim arctanx
-\sim e^x-1 \sim ln(x+1)\)</span></p>
-<p><span class="math inline">\(a^x-1 \sim xlna\)</span> $_{a}{(x+1)} $
-<span class="math inline">\((1+x)^m - 1 \sim mx\)</span> <span class="math inline">\(1-cos^2x\sim \frac 1 2x^2\)</span></p>
-<h4 id="三高阶求导公式">三、高阶求导公式</h4>
-<p><span class="math inline">\({(a^x)}^{(n)} = a^x(lna)^n(a&gt;0且a \ne
-1)\)</span> <span class="math inline">\((sin(kx))^{(n)}
-=k^nsin(kx+n\cdot \frac{\pi}{2})\)</span></p>
-<p><span class="math inline">\((lnx)^{(n)} = (-1)^n\frac{(n-1)!}{x^n}
-(x&gt;0)\)</span> $(xe<sup>x)</sup>{(n)} = (x+n)e^x $</p>
-<h4 id="四对数指数运算法则">四、对数指数运算法则</h4>
-<p><span class="math inline">\(log_{a}b =
-\frac{log_{c}b}{log_c{a}}\)</span></p>
-<h4 id="五因式分解">五、因式分解</h4>
-<p><span class="math inline">\((x+y)^3 =
-x^3+3x^2y+3xy^2+y^3\)</span></p>
-<p><span class="math inline">\((x-y)^3 =
-x^3-3x^2y+3xy^2-y^3\)</span></p>
-<p><span class="math inline">\(x^3-y^3 = (x-y)(x^2+xy+y^2)\)</span></p>
-<p><span class="math inline">\(x^3+y^3 = (x+y)(x^2-xy+y^2)\)</span></p>
-<h4 id="六不等式">六、不等式</h4>
-<h5 id="绝对值不等式">1. 绝对值不等式</h5>
-<p><span class="math inline">\(\left | a\pm b \right | \le \left | a
-\right | + \left | b \right |\)</span></p>
-<p><span class="math inline">\(\left |\left| a \right | - \left| b
-\right| \right | \le \left | a \right | - \left | b \right
-|\)</span></p>
-<p>$ $</p>
-]]></content>
-      <tags>
-        <tag>考研数学</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>软件测试概述</title>
     <url>/2022/05/01/Software%20Testing/</url>
     <content><![CDATA[<h2 id="软件测试的内涵">软件测试的内涵</h2>
@@ -1497,6 +1216,632 @@ vs 自动化测试：<u>从是否需要人工介入来区分</u></h4>
 对所发现的缺陷进行跟踪</p>
 <h3 id="测试评估">测试评估</h3>
 <p>结合量化的测试覆盖率及缺陷跟踪报告，<u>对整个软件质量、测试工作和软件缺陷进行总结</u></p>
+]]></content>
+      <tags>
+        <tag>软件测试</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux三剑客之awk</title>
+    <url>/2022/05/18/awk/</url>
+    <content><![CDATA[<h3 id="简介">1. 简介</h3>
+<p>awk是一门<strong>编程语言</strong>，主要应用领域为数据<strong>过滤、统计和计算</strong>，在系统中通常用来处理日志数据。</p>
+<p>使用命令 <code>man awk</code> 查看awk的详细信息</p>
+<h3 id="执行过程">2. 执行过程</h3>
+<h4 id="示例代码">2.1 示例代码</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">BEGIN&#123;<span class="built_in">print</span> <span class="string">&quot;name&quot;</span>&#125; 打印<span class="string">&#x27;name&#x27;</span>字符串</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">&#123;<span class="built_in">print</span> <span class="variable">$2</span>&#125; 打印每一行的第二列，前面可以加上条件</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">END&#123;<span class="built_in">print</span> <span class="string">&quot;end of file&quot;</span>&#125; 打印EOF</span></span><br><span class="line">awk -F, &#x27;BEGIN&#123;print &quot;name&quot;&#125;&#123;print $2&#125;END&#123;print &quot;end of file&quot;&#125;&#x27; test.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">带条件的awk命令，指定打印第二行第二列内容</span></span><br><span class="line">awk -F, &#x27;BEGIN&#123;print &quot;name&quot;&#125;NR==2&#123;print $2&#125;END&#123;print &quot;end of file&quot;&#125;&#x27; test.txt</span><br></pre></td></tr></table></figure></div>
+<h4 id="流程">2.2 流程</h4>
+<p><strong>读取文件之前</strong>：进行命令行赋值或设置命令行参数，并运行BEGIN{}方法体</p>
+<p><strong>读取文件过程</strong>：读取文件内容 <span class="math inline">\(\rightarrow\)</span> 判断是否满足结束条件 <span class="math inline">\(\rightarrow\)</span> 不满足则继续读取下一行 <span class="math inline">\(\rightarrow\)</span> EOF</p>
+<p><strong>读取文件之后</strong>：运行END{}方法体</p>
+<h3 id="常用操作">3. 常用操作</h3>
+<h4 id="行和列">3.1 行和列</h4>
+<p><strong>行</strong>：在awk中称为记录(record)，每一行默认通过回车分割</p>
+<p><strong>列</strong>：在awk中称为字段/域(field)，每一列默认通过空格分割</p>
+<blockquote>
+<p>awk中的行列结束标记都可以修改</p>
+</blockquote>
+<h5 id="取行">3.1.1 取行</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">NR：行号</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">符号包括 &gt; &lt; &lt;= &gt;= == !=</span></span><br><span class="line">NR == 1 # 取出第一行</span><br><span class="line">NR &gt;= 1 &amp;&amp; NR &lt;= 5 # 取出1~5行</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">直接索引</span></span><br><span class="line">awk &#x27;/kjournald/&#x27; test.txt # 取出所有带有&#x27;kjournald&#x27;记录</span><br></pre></td></tr></table></figure></div>
+<h5 id="取列">3.1.2 取列</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-F 指定分隔符(默认为空格/连续的空格/tab键)</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="variable">$1</span> 取出第1列</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="variable">$0</span> 表示整行的内容</span></span><br><span class="line">awk &#x27;&#123;print $6&#125;&#x27; test.txt # 取出第6列的全部内容</span><br><span class="line">awk NR==2&#x27;&#123;print $0&#125;&#x27; test.txt # 取出第2行的全部内容</span><br><span class="line">awk &#x27;&#123;print $1,$2&#125;&#x27; test.txt # 取出第1列和第2列的全部内容</span><br><span class="line">awk &#x27;&#123;print $1,$3,$5&#125;&#x27; test.txt |column -t # 取出第1,3,5列的全部内容，并进行对齐</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">NF：每行有多少字段</span></span><br><span class="line">awk &#x27;&#123;print $NF&#125;&#x27; test.txt # 取最后一列</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">结果间可以自定义分隔符</span></span><br><span class="line">awk &#x27;&#123;print $1 &quot;@&quot; $3&#125;&#x27; test.txt # 取出第1,3列，并以@分割</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">OFS: OutPut Field Separator，输出时的分隔符，默认为空格</span></span><br><span class="line">awk -F: -vOFS=: &#x27;&#123;print $NF,$2,$3,$4,$5,$6,$1&#125;&#x27; test.txt # 输出时默认以:分割</span><br></pre></td></tr></table></figure></div>
+<h4 id="awk模式匹配">3.2 awk模式匹配</h4>
+<p>了解awk的条件有哪些情况：</p>
+<ul>
+<li>比较符号： &gt; &lt; &gt;= &lt;= == !=</li>
+<li>正则表达式</li>
+<li>范围表达式</li>
+<li>特殊条件：BEGIN{} END{}</li>
+</ul>
+<h5 id="比较表达式">3.2.1 比较表达式</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line">awk &#x27;NR&gt;=1 &amp;&amp; NR &lt;=3&#x27; test.txt</span><br></pre></td></tr></table></figure></div>
+<h5 id="正则">3.2.2 正则</h5>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">正则</th>
+<th style="text-align: center;">awk正则</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">^ 表示以...开头的行</td>
+<td style="text-align: center;">某一列的开头</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">$ 表示以...结尾的行</td>
+<td style="text-align: center;">某一列的结尾</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">^$表示空行</td>
+<td style="text-align: center;">某一列的空(少用)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>支持扩展正则</li>
+<li>awk的正则可以精确到行，指定包含或不包含指定内容</li>
+<li>~包含</li>
+<li>!~不包含</li>
+</ul>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出第3列以1开头的行</span></span><br><span class="line">awk -F: &#x27;$3~/^1/&#x27; /etc/passwd</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找到第3列以2开头的行，并显示第1列，第3列和最后一列</span></span><br><span class="line">awk -F: &#x27;$3~/^2/&#123;print $1,$3,$NF&#125;&#x27; /etc/passwd</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找到第3列以1或2开头的行</span></span><br><span class="line">awk -F: &#x27;$3~/^[12]/&#123;print $1,$3,$NF&#125;&#x27; /etc/passwd</span><br></pre></td></tr></table></figure></div>
+<h5 id="范围表达式">3.2.3 范围表达式</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/哪里开始/,/哪里结束/ (最常用的语法)</span></span><br><span class="line">awk &#x27;/11:02:00/,/11:02:30/&#123;print $1&#125;&#x27; access.log # 打印30秒内日志的第一行</span><br></pre></td></tr></table></figure></div>
+<h5 id="特殊模式begin和end">3.2.3 特殊模式BEGIN{}和END</h5>
+<p><strong>BEGIN{}</strong>：awk读取文件前执行，用于：</p>
+<ul>
+<li>进行简单统计/计算，</li>
+<li>添加表头</li>
+<li>用来定义awk变量(少用，一般用-v)</li>
+</ul>
+<p><strong>END{}</strong>：awk读取文件后执行，用于：</p>
+<ul>
+<li>进行统计，输入计算结果</li>
+<li>awk使用数组，用来输出数组的结果</li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th>统计方法</th>
+<th>简写形式</th>
+<th>应用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>i = i + 1</td>
+<td>i++</td>
+<td>计数</td>
+</tr>
+<tr class="even">
+<td>sum = sum + ?</td>
+<td>sum += ?</td>
+<td>求和</td>
+</tr>
+<tr class="odd">
+<td>array[] = array[] + 1</td>
+<td>array[]++</td>
+<td>数组分类计数</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>sum和i都是<strong>变量</strong></p>
+</blockquote>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">统计 /etc/services里有多少个空行</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">i++ 每行进行统计 | <span class="built_in">print</span> i 输出结果</span> </span><br><span class="line">awk &#x27;/^$/&#123;i++&#125;END&#123;print i&#125;&#x27; /etc/services</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">计算1+2+3+...+100</span></span><br><span class="line">seq 100|awk &#x27;&#123;sum += $1&#125;END&#123;print sum&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看过程</span></span><br><span class="line">seq 100|awk &#x27;&#123;sum += $1;print sum&#125;END&#123;print sum&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+<h4 id="awk数组">3.3 awk数组</h4>
+<ul>
+<li>统计日志：统计每个ip出现次数，统计每种状态码的出现次数，统计攻击者ip出现次数</li>
+<li>统计每个ip消耗的流量</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 5%">
+<col style="width: 55%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th>shell数组</th>
+<th>awk数组</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">形式</td>
+<td>array[0] = token1 array[1] = token2</td>
+<td>array[0] = token1 array[1] = token2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">使用</td>
+<td>echo ${array[0]} $(array[1]}</td>
+<td>print array[0] array[1]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">批处理</td>
+<td>for i in ${array[*]} <br>do <br> echo $i<br>done</td>
+<td>for(i in array)<br> print array[i]</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">错误写法：awk中所有字母都被识别为变量，字符串需要使用双引号围绕</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=token1;a[1]=token2;print a[0],a[1]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">正确写法</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=&quot;token1&quot;;a[1]=&quot;token2&quot;;print a[0],a[1]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">批处理</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=&quot;token1&quot;;a[1]=&quot;token2&quot;;for(i in a) print a[i]&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+<h5 id="范例一">范例一</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">处理以下文件内容，取出域名并进行计数和排序处理</span></span><br><span class="line">http://www.etiantian.org/index.html</span><br><span class="line">http://www.etiantian.org/index.html</span><br><span class="line">http://post.etiantian.org/index.html</span><br><span class="line">http://mp3.etiantian.org/index.html</span><br><span class="line">http://www.etiantian.org/3.html</span><br><span class="line">http://post.etiantian.org/2.html</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">需要计算</span></span><br><span class="line">www.etiantian.org 出现次数</span><br><span class="line">post.etiantian.org 出现次数</span><br><span class="line">mp3.etiantian.org 出现次数</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">代码</span></span><br><span class="line">awk -F/ &#x27;&#123;array[$3]++&#125;END&#123;for(i in array) print i,array[i]&#125;&#x27; test.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出结果</span></span><br><span class="line">mp3.etiantian.org 1</span><br><span class="line">www.etiantian.org 3</span><br><span class="line">post.etiantian.org 2</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">排序</span></span><br><span class="line">awk -F/ &#x27;&#123;array[$3]++&#125;END&#123;for(i in array) print i,array[i]&#125;&#x27; test.txt|sort -rnk2</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出结果</span></span><br><span class="line">www.etiantian.org 3</span><br><span class="line">post.etiantian.org 2</span><br><span class="line">mp3.etiantian.org 1</span><br></pre></td></tr></table></figure></div>
+<h4 id="awk循环和判断">3.4 awk循环和判断</h4>
+<h5 id="for循环">3.4.1 for循环</h5>
+<table>
+<colgroup>
+<col style="width: 56%">
+<col style="width: 43%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>shell的c语言for循环</th>
+<th>awk的for循环</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>for((i = 1; i &lt;= 10; i++)) <br>do<br> echo $n<br>done</td>
+<td>for(int i = 1; i &lt;= 10; i++)<br> print i</td>
+</tr>
+</tbody>
+</table>
+<p><div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line">awk &#x27;BEGIN&#123;</span><br><span class="line">for(i=1;i&lt;=100;i++)</span><br><span class="line">	sum+=i; </span><br><span class="line">	print sum;</span><br><span class="line">&#125;&#x27;</span><br></pre></td></tr></table></figure></div></p>
+<h5 id="if判断">3.4.2 if判断</h5>
+<table>
+<colgroup>
+<col style="width: 50%">
+<col style="width: 49%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>shell if判断</th>
+<th>awk if判断</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>if["token -eq 18"]; then <br> echo take to do sth<br>else<br>
+echo "rest"<br>pass</td>
+<td>if(condition)<br> print sth<br>else<br> print other</td>
+</tr>
+</tbody>
+</table>
+<h5 id="范例2">范例2</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">统计这段语句中，单词中字符数小于6的单词，并显示</span></span><br><span class="line">echo I am a student studing in XMU university</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">代码 length(<span class="variable">$i</span>) 统计第i列的长度</span></span><br><span class="line">echo I am a student studing in XMU university. |awk &#x27;&#123;for(i=1;i&lt;=NF;i++)&#123;if(length($i) &lt;6) print $i&#125;&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+<h3 id="awk总结">4. awk总结</h3>
+<ul>
+<li><p>awk选项 -F -v</p></li>
+<li><p>awk执行流程</p></li>
+<li><p>awk取行取列</p></li>
+<li><p>awk模式：正则、范围、特殊模式</p></li>
+<li><p>awk数组</p></li>
+<li><p>awk控制：for / if</p></li>
+<li><p>awk帮助：man awk / info awk</p></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2022/04/29/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very
+first post. Check <a href="https://hexo.io/docs/">documentation</a> for
+more info. If you get any problems when using Hexo, you can find the
+answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or
+you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="create-a-new-post">Create a new post</h3>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure></div>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="run-server">Run server</h3>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure></div>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="generate-static-files">Generate static files</h3>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure></div>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="BASH"><figure class="iseeu highlight /bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure></div>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>序列化和反序列化</title>
+    <url>/2022/04/29/%E5%BA%8F%E5%88%97%E5%8C%96%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</url>
+    <content><![CDATA[<h4 id="序列化和反序列化的定义">序列化和反序列化的定义</h4>
+<p><strong>序列化</strong>：把对象转化为可传输的字节序列的过程</p>
+<p><strong>反序列化</strong>：把字节序列还原为对象的过程</p>
+<hr>
+<h4 id="为什么要序列化">为什么要序列化</h4>
+<p><strong>目的</strong>：让对象可以<strong>跨平台存储</strong>和进行<strong>网络传输</strong></p>
+<p><strong>因果</strong>：网络传输的方式是I/O <span class="math inline">\(\rightarrow\)</span> I/O支持的数据格式为字节数组
+<span class="math inline">\(\rightarrow\)</span>
+对象要传输需要序列化为字节序列</p>
+<p><strong>规范</strong>：序列化需要遵循规则，使得传输到目的地的字节序列能通过该规则反序列化还原为对象</p>
+<hr>
+<h4 id="需要序列化的场景">需要序列化的场景</h4>
+<p>凡是需要<strong>跨平台存储</strong>和<strong>网络传输</strong>的数据，都需要序列化</p>
+<p>网络传输本质：对象 <span class="math inline">\(\rightarrow\)</span>
+字节序列 <span class="math inline">\(\rightarrow\)</span> 网络 <span class="math inline">\(\rightarrow\)</span> 字节序列 <span class="math inline">\(\rightarrow\)</span> 对象</p>
+<p>跨平台存储本质：对象 <span class="math inline">\(\rightarrow\)</span>
+跨平台字节码 <span class="math inline">\(\rightarrow\)</span> 跨平台
+<span class="math inline">\(\rightarrow\)</span> 跨平台字节码 <span class="math inline">\(\rightarrow\)</span> 对象</p>
+<hr>
+<h4 id="序列化的选择">序列化的选择</h4>
+<p><strong>常见的序列化方式</strong></p>
+<p>不支持跨语言：JDK、Kryo、FST</p>
+<p>支持跨语言：JSON、Hessian、Thrift、Protostuff</p>
+<p><strong>序列化的速度</strong></p>
+<p>如果一个项目中需要序列化的场景很多，那么选择序列化效率高的协议能显著提高系统性能</p>
+<p><strong>序列化字节序列的大小</strong></p>
+<p>数据越小越好，传输快，提升系统性能</p>
+<hr>
+<h4 id="java中的序列化">Java中的序列化</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Java中要实现序列化，只需要实现Serializable接口即可</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment"> * 需要注意的问题</span></span><br><span class="line"><span class="comment"> * 1. static属性不能被序列化</span></span><br><span class="line"><span class="comment"> * 序列化保存的是对象的状态，静态变量属于类的状态，因此序列化不保存静态变量</span></span><br><span class="line"><span class="comment"> * 2. transient属性不会被序列化</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">transient</span> ElemType t;</span><br><span class="line">    <span class="keyword">private</span> ElemType e;    </span><br><span class="line">    <span class="comment">// 经过序列化和反序列化，t中的值会丢失(t == null)，e中的值不会丢失(e == something)</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<h4 id="序列化版本号serialversionuid">序列化版本号serialVersionUID</h4>
+<p>所有实现序列化的对象都必须有一个版本号，可以自定义，否则JDK工具会按照对象属性自动生成</p>
+<p><strong>版本号的用途</strong></p>
+<p>在序列化业务需求发生变化后，通过修改版本号告诉反序列化一方的对象需要同步修改</p>
+<p><strong>JDK自动生成的版本号和我们自定义的版本号的区别</strong></p>
+<p>JDK根据对象的属性信息生成版本号，意味着对象的属性和序列化版本号会同步改变</p>
+<p>坏处：只要对象有一点小变动版本号就会变更，用户必须强制更新软件，而现实需求应该是：<strong>用户可以选择不更新，不更新仅仅无法体验新增加的功能而已</strong>，而这时候就需要我们自定义的版本号了，<strong>只要序列化版本一样，对象新增属性不会影响反序列化对象</strong>。</p>
+<hr>
+<h4 id="父类子类序列化问题">父类、子类序列化问题</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1.父类不实现序列化，子类实现序列化</span></span><br><span class="line"><span class="comment">// 父类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Parent</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String hobby;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">extends</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化后再反序列化</span></span><br><span class="line"><span class="comment">// 最终结果：父类结果未被序列化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2.父类实现序列化，子类不实现序列化</span></span><br><span class="line"><span class="comment">// 父类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String hobby;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">extends</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化后再反序列化</span></span><br><span class="line"><span class="comment">// 最终结果：子类属性序列化正常</span></span><br></pre></td></tr></table></figure></div>
+]]></content>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数学公式速查</title>
+    <url>/2022/08/10/%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E9%80%9F%E6%9F%A5/</url>
+    <content><![CDATA[<h4 id="一泰勒公式">一、泰勒公式</h4>
+<h5 id="带拉格朗日余项的n阶泰勒公式">1. 带拉格朗日余项的n阶泰勒公式</h5>
+<p>$f(x) = f(x_0) + f(x_0)'(x-x_0)+(x-x_0)<sup>2+...+(x-x_0)</sup>n
++(x-x_0)^{n+1},介于x和x_0之间 $</p>
+<h5 id="带佩亚诺余项的n阶泰勒公式">2. 带佩亚诺余项的n阶泰勒公式</h5>
+<p><span class="math inline">\(f(x) = f(x_0) +
+f(x_0)&#39;(x-x_0)+\frac{f(x_0)&#39;&#39;}{2!}(x-x_0)^2+...+\frac{f(x_0){}^{(n)}}{n!}(x-x_0)^n
++o((x-x_0)^n)\)</span></p>
+<h5 id="常见的低阶泰勒公式">3. 常见的低阶泰勒公式</h5>
+<p>$sinx = x - x<sup>3+o(x</sup>3) $ $arcsinx = x + x<sup>3+o(x</sup>3)
+$</p>
+<p><span class="math inline">\(tanx = x + \frac{1}{3}x^3+o(x^3)\)</span>
+$arctanx = x - x<sup>3+o(x</sup>3) $</p>
+<p>$cosx = 1 - x^2 + x^4 + o(x^4) $ <span class="math inline">\(e^x = 1
++ x + \frac{x^2}{2!} + \frac{x^3}{3!} + o(x^3)\)</span></p>
+<p><span class="math inline">\(ln(1+x) = x - \frac{x^2}{2} +
+\frac{x^3}{3} + o(x^3)\)</span> $(1+x)^m = 1 + mx + x^2 + o(x^2) $</p>
+<h4 id="二等价无穷小">二、等价无穷小</h4>
+<p>当<span class="math inline">\(x \rightarrow 0\)</span>时，有</p>
+<p><span class="math inline">\(sinx \sim arcsinx \sim tanx \sim arctanx
+\sim e^x-1 \sim ln(x+1)\)</span></p>
+<p><span class="math inline">\(a^x-1 \sim xlna\)</span> $_{a}{(x+1)} $
+<span class="math inline">\((1+x)^m - 1 \sim mx\)</span> <span class="math inline">\(1-cos^2x\sim \frac 1 2x^2\)</span></p>
+<h4 id="三高阶求导公式">三、高阶求导公式</h4>
+<p><span class="math inline">\({(a^x)}^{(n)} = a^x(lna)^n(a&gt;0且a \ne
+1)\)</span> <span class="math inline">\((sin(kx))^{(n)}
+=k^nsin(kx+n\cdot \frac{\pi}{2})\)</span></p>
+<p><span class="math inline">\((lnx)^{(n)} = (-1)^n\frac{(n-1)!}{x^n}
+(x&gt;0)\)</span> $(xe<sup>x)</sup>{(n)} = (x+n)e^x $</p>
+<h4 id="四对数指数运算法则">四、对数指数运算法则</h4>
+<p><span class="math inline">\(log_{a}b =
+\frac{log_{c}b}{log_c{a}}\)</span></p>
+<h4 id="五因式分解">五、因式分解</h4>
+<p><span class="math inline">\((x+y)^3 =
+x^3+3x^2y+3xy^2+y^3\)</span></p>
+<p><span class="math inline">\((x-y)^3 =
+x^3-3x^2y+3xy^2-y^3\)</span></p>
+<p><span class="math inline">\(x^3-y^3 = (x-y)(x^2+xy+y^2)\)</span></p>
+<p><span class="math inline">\(x^3+y^3 = (x+y)(x^2-xy+y^2)\)</span></p>
+<h4 id="六不等式">六、不等式</h4>
+<h5 id="绝对值不等式">1. 绝对值不等式</h5>
+<p><span class="math inline">\(\left | a\pm b \right | \le \left | a
+\right | + \left | b \right |\)</span></p>
+<p><span class="math inline">\(\left |\left| a \right | - \left| b
+\right| \right | \le \left | a \right | - \left | b \right
+|\)</span></p>
+<p>$ $</p>
+]]></content>
+      <tags>
+        <tag>考研数学</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>白盒测试</title>
+    <url>/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/</url>
+    <content><![CDATA[<h2 id="白盒测试">白盒测试</h2>
+<p>白盒测试把程序视为一个<strong>透明的盒子</strong>，根据<strong>程序内部结构</strong>设计测试用例，测试需要<strong>覆盖全部代码的分支、路径和条件</strong></p>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220502000324686.png" alt="image-20220502000324686" style="zoom:67%;"></p>
+<p>白盒测试有<u>静态测试和动态测试</u>两种方法</p>
+<h2 id="静态测试程序结构分析">静态测试(程序结构分析)</h2>
+<h5 id="代码走查一组程序-错误检查技术">代码走查：一组程序 +
+错误检查技术</h5>
+<p>人员：组长(分配资料、安排计划) + 资深程序员 + 测试人员 +
+程序开发员</p>
+<p>内容：探讨代码编写思路</p>
+<h5 id="代码审查">代码审查</h5>
+<ol type="1">
+<li>检查代码和设计的一致性</li>
+<li>代码可读性</li>
+<li>代码逻辑正确性</li>
+<li>代码结构合理性</li>
+<li>公司整理的易错点checklist</li>
+</ol>
+<p>步骤：准备 <span class="math inline">\(\rightarrow\)</span> 程序阅读
+<span class="math inline">\(\rightarrow\)</span> 审查会 <span class="math inline">\(\rightarrow\)</span> 跟踪报告</p>
+<h5 id="控制流分析检查程序的控制结构">控制流分析：检查程序的控制结构</h5>
+<ul>
+<li><p><strong>程序流程图</strong></p>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508123614063.png" alt="image-20220508123614063" style="zoom:67%;"></p></li>
+<li><p><strong>控制流图(必考)</strong></p></li>
+</ul>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317170655642.png" alt="image-20220317170655642" style="zoom:60%;"></p>
+<ul>
+<li><strong>控制流图矩阵(控制流图的矩阵形式)</strong></li>
+</ul>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317170914579.png" alt="image-20220317170914579" style="zoom:67%;"></p>
+<h5 id="数据流分析程序错误">数据流分析(程序错误)</h5>
+<ul>
+<li><p>如果某一语句执行能<strong>改变变量x的值</strong>，则称x被该语句<strong>定义</strong></p></li>
+<li><p>如果某一语句执行了<strong>内存中变量x的值</strong>，则称x被该语句<strong>引用</strong></p></li>
+<li><p>常见的程序错误有：错拼名字、名字混淆、语句丢失等(一般都是编译器能检测的错误)</p></li>
+</ul>
+<h5 id="信息流分析">信息流分析</h5>
+<ul>
+<li>检查是否存在无用的语句</li>
+</ul>
+<h2 id="动态测试逻辑覆盖">动态测试(逻辑覆盖) ★★★★★</h2>
+<p>考虑如下程序：</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(A &gt; <span class="number">1</span> &amp;&amp; B == <span class="number">0</span>)</span><br><span class="line">	X = X/A;</span><br><span class="line"><span class="keyword">if</span>(A == <span class="number">2</span> || X &gt; <span class="number">1</span>)</span><br><span class="line">	X = X + <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>其程序流程图为：</p>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317171842004.png" alt="image-20220317171842004" style="zoom:67%;"></p>
+<h3 id="语句覆盖">语句覆盖</h3>
+<p>设计若干个设计用例，然后运行被测程序，<strong>使程序中每个可执行语句至少执行一次</strong></p>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
+<p><strong>解释</strong>：蓝色的路径覆盖了所有<strong>语句</strong>(b和d路径上没有语句)，这条测试用例则实现了100%语句覆盖</p>
+<p><strong>测试用例</strong>：A = 2，B = 0，X = 3</p>
+<blockquote>
+<p>注意：用<strong>尽量少</strong>的设计用例覆盖所有可执行语句</p>
+<p>语句覆盖率 = 已执行 / 可执行 * 100%</p>
+</blockquote>
+<p><strong>优点</strong>：检查所有语句、简单易行、覆盖率高</p>
+<p><strong>缺点</strong>：以下是语句覆盖无法检测的错误</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="ARMASM"><figure class="iseeu highlight /armasm"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 条件语句错误</span></span><br><span class="line">A &gt; <span class="number">1</span> &amp;&amp; <span class="keyword">B</span> == <span class="number">0</span> -&gt; A &gt; <span class="number">0</span> &amp;&amp; <span class="keyword">B</span> == <span class="number">0</span></span><br><span class="line"><span class="comment">// 逻辑运算错误</span></span><br><span class="line">A &gt; <span class="number">1</span> &amp;&amp; <span class="keyword">B</span> == <span class="number">0</span> -&gt; A &gt; <span class="number">1</span> <span class="title">||</span> <span class="keyword">B</span> == <span class="number">0</span></span><br><span class="line"><span class="comment">// 循环次数错误</span></span><br><span class="line"><span class="symbol">for</span>(int i = <span class="number">0</span><span class="comment">; i &lt; n; i++) -&gt; for(int i = 0; i &lt;= n; i++)</span></span><br></pre></td></tr></table></figure></div>
+<h3 id="分支覆盖">分支覆盖</h3>
+<p>分支覆盖又称判定覆盖，<strong>程序流程图中每条边走一遍</strong></p>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651985586292.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
+<p><strong>解释</strong>：直观上看，就是把流程图所有能覆盖的线全部覆盖住，则分支覆盖就能达到100%</p>
+<table>
+<thead>
+<tr class="header">
+<th>测试用例</th>
+<th>覆盖路径</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A = 2, B = 0, X = 3</td>
+<td>ace(蓝色)</td>
+</tr>
+<tr class="even">
+<td>A = 1, B = 0, X = 1</td>
+<td>abd(红色)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>分支覆盖率 = 已判定 / 总判定</p>
+<p>分支覆盖的测试用例划分不止一种</p>
+<p>纠错能力比语句覆盖好一些</p>
+</blockquote>
+<h3 id="条件覆盖">条件覆盖</h3>
+<p>使得被测程序每个判断中的<strong>每个条件的可能取值至少要满足一次</strong></p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="YAML"><figure class="iseeu highlight /yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">//</span> <span class="string">第一个条件</span></span><br><span class="line"><span class="attr">T1:</span> <span class="string">A</span> <span class="string">&gt;</span>  <span class="number">1</span>  </span><br><span class="line"><span class="attr">F1:</span> <span class="string">A</span> <span class="string">&lt;=</span> <span class="number">1</span></span><br><span class="line"><span class="attr">T2:</span> <span class="string">B</span> <span class="string">==</span> <span class="number">0</span></span><br><span class="line"><span class="attr">F2:</span> <span class="string">B</span> <span class="type">!=</span> <span class="number">0</span></span><br><span class="line"><span class="string">//</span> <span class="string">第二个条件</span></span><br><span class="line"><span class="attr">T3:</span> <span class="string">A</span> <span class="string">==</span> <span class="number">2</span></span><br><span class="line"><span class="attr">F3:</span> <span class="string">A</span> <span class="type">!=</span> <span class="number">2</span></span><br><span class="line"><span class="attr">T4:</span> <span class="string">X</span> <span class="string">&gt;</span>  <span class="number">1</span></span><br><span class="line"><span class="attr">F4:</span> <span class="string">X</span> <span class="string">&lt;=</span> <span class="number">1</span></span><br><span class="line"><span class="string">//</span> <span class="string">缺点：不能实现对每个分支的检查，用例数量增加</span></span><br></pre></td></tr></table></figure></div>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651986336995.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
+<p><strong>为什么需要abe？</strong></p>
+<p><strong>解释</strong>：因为仅有ace和abd的情况下，条件F2和F4没有被测试，而条件覆盖要求<strong>所有条件的正反面都要至少被测试一次</strong>。</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">用例编号</th>
+<th style="text-align: center;">ABX</th>
+<th style="text-align: center;">路径</th>
+<th style="text-align: center;">覆盖条件</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">203</td>
+<td style="text-align: center;">ace</td>
+<td style="text-align: center;">T1 T2 T3 T4</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">101</td>
+<td style="text-align: center;">abd</td>
+<td style="text-align: center;">F1 T2 F3 T4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">211</td>
+<td style="text-align: center;">abe</td>
+<td style="text-align: center;">T1 <strong>F2</strong> T3
+<strong>F4</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>条件覆盖不是分支覆盖的超集</p>
+</blockquote>
+<h3 id="分支-条件覆盖">分支-条件覆盖</h3>
+<p>顾名思义，分支覆盖 + 条件覆盖</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="ARMASM"><figure class="iseeu highlight /armasm"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 第一个分支</span></span><br><span class="line">(<span class="number">1</span>) A &gt; <span class="number">1</span>,  <span class="keyword">B</span> == <span class="number">0</span>, 记为T1, T2</span><br><span class="line">(<span class="number">2</span>) A &gt; <span class="number">1</span>,  <span class="keyword">B</span> != <span class="number">0</span>, 记为T1, <span class="built_in">F2</span></span><br><span class="line">(<span class="number">3</span>) A &lt;= <span class="number">1</span>, <span class="keyword">B</span> == <span class="number">0</span>, 记为<span class="built_in">F1</span>, T2</span><br><span class="line">(<span class="number">4</span>) A &lt;= <span class="number">1</span>, <span class="keyword">B</span> != <span class="number">0</span>, 记为<span class="built_in">F1</span>, <span class="built_in">F2</span></span><br><span class="line"><span class="comment">// 第二个分支</span></span><br><span class="line">(<span class="number">5</span>) A == <span class="number">2</span>, X &gt;  <span class="number">1</span>, 记为T3, T4</span><br><span class="line">(<span class="number">6</span>) A == <span class="number">2</span>, X &lt;= <span class="number">1</span>, 记为T3, <span class="built_in">F4</span></span><br><span class="line">(<span class="number">7</span>) A != <span class="number">2</span>, X &gt;  <span class="number">1</span>, 记为<span class="built_in">F3</span>, T4</span><br><span class="line">(<span class="number">8</span>) A != <span class="number">2</span>, X &lt;= <span class="number">1</span>, 记为<span class="built_in">F3</span>, <span class="built_in">F4</span></span><br></pre></td></tr></table></figure></div>
+<p>太懒了，图略</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">用例编号</th>
+<th style="text-align: center;">ABX</th>
+<th style="text-align: center;">覆盖组合号</th>
+<th style="text-align: center;">路径</th>
+<th style="text-align: center;">覆盖条件</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">203</td>
+<td style="text-align: center;">(1)(5)</td>
+<td style="text-align: center;">ace</td>
+<td style="text-align: center;">T1 T2 T3 T4</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">211</td>
+<td style="text-align: center;">(2)(6)</td>
+<td style="text-align: center;">abe</td>
+<td style="text-align: center;">T1 F2 T3 F4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">103</td>
+<td style="text-align: center;">(3)(7)</td>
+<td style="text-align: center;">abe</td>
+<td style="text-align: center;">F1 T2 F3 T4</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">111</td>
+<td style="text-align: center;">(4)(8)</td>
+<td style="text-align: center;">abd</td>
+<td style="text-align: center;">F1 F2 F3 F4</td>
+</tr>
+</tbody>
+</table>
+<p>解释：主要关注覆盖组合号和覆盖条件，要求如下：</p>
+<ul>
+<li>覆盖组合号：每条测试用例必须包含<strong>第一个分支和第二个分支的一种不同组合</strong></li>
+<li>覆盖条件：<strong>T1 - T4, F1 - F4</strong>的所有条件都需要覆盖</li>
+</ul>
+<blockquote>
+<p>漏掉了路径acd，并不是完备的测试</p>
+</blockquote>
+<h3 id="路径覆盖">路径覆盖：</h3>
+<p>覆盖程序中<strong>所有可能的路径</strong>(理想的测试程度)</p>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="XL"><figure class="iseeu highlight /xl"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="title">ace</span> -&gt;</span> L1</span><br><span class="line"><span class="function"><span class="title">abc</span> -&gt;</span> L2</span><br><span class="line"><span class="function"><span class="title">abe</span> -&gt;</span> L3</span><br><span class="line"><span class="function"><span class="title">acd</span> -&gt;</span> L4</span><br></pre></td></tr></table></figure></div>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651987244264.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
+<p><strong>解释</strong>：组合数学原理，第一个分支有两个选择，第二个分支有两个选择，故共有2
+<span class="math inline">\(\times\)</span> 2 = 4种选择</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">用例编号</th>
+<th style="text-align: center;">ABX</th>
+<th style="text-align: center;">覆盖路径</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">203</td>
+<td style="text-align: center;">ace(L1)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">101</td>
+<td style="text-align: center;">abd(L2)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">211</td>
+<td style="text-align: center;">abe(L3)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">301</td>
+<td style="text-align: center;">acd(L4)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>路径测试虽然完备，但是当项目达到一定量级时，独立路径的数量会非常大</p>
+</blockquote>
+<h3 id="基本路径测试方法">基本路径测试方法</h3>
+<h5 id="四个步骤">四个步骤：</h5>
+<ol type="1">
+<li><p>画出程序的<strong>控制流图</strong></p></li>
+<li><p>计算程序的<strong>环形复杂度</strong></p>
+<ul>
+<li><p>一种为程序逻辑复杂度提供<strong>定量尺度</strong>的软件度量</p></li>
+<li><p>提供程序基本集的独立路径数量</p></li>
+<li><p><strong>计算方法</strong>：<span class="math inline">\(V = E - N
++ 2\)</span>(<span class="math inline">\(E\)</span>是控制流图中边的数量，<span class="math inline">\(N\)</span>是节点数量)</p>
+<p>​ <span class="math inline">\(V = P + 1\)</span>(<span class="math inline">\(P\)</span>是控制流图中<strong>判定节点</strong>的数量)</p></li>
+</ul></li>
+<li><p>导出基本路径集，<strong>确定程序的独立路径</strong></p>
+<blockquote>
+<p>独立路径：和其他的独立路径相比，<strong>至少引入一个新处理语句或一个新判断的程序通路</strong></p>
+</blockquote></li>
+<li><p>根据独立路径，<strong>设计测试用例</strong>的输入数据和预期输出</p></li>
+</ol>
+<h3 id="最少测试用例数计算">最少测试用例数计算</h3>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317194219038.png" alt="image-20220317194219038" style="zoom:67%;"></p>
+<p>对于嵌套型分支结构，若有<span class="math inline">\(n\)</span>个判定语句，需要<span class="math inline">\(n+1\)</span>个测试用例</p>
+<p>对于连锁型分支结构，若有<span class="math inline">\(n\)</span>个判定语句，需要有<span class="math inline">\(n*m\)</span>个测试用例</p>
+<h4 id="例子">例子</h4>
+<blockquote>
+<p>计算该程序的最少测试用例数</p>
+</blockquote>
+<figure>
+<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508141945220.png" alt="image-20220508141945220">
+<figcaption aria-hidden="true">image-20220508141945220</figcaption>
+</figure>
+<blockquote>
+<p>将程序分解，可分为4个大的连锁分支结构</p>
+</blockquote>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142428384.png" alt="image-20220508142428384" style="zoom:80%;"></p>
+<ul>
+<li><strong>1</strong>：<span class="math inline">\(n\)</span> + 1 = 1 +
+1 = 2</li>
+</ul>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142455731.png" alt="image-20220508142455731" style="zoom:80%;"></p>
+<ul>
+<li><p><strong>2 - 8</strong>：可以分为2和3 - 8</p>
+<ul>
+<li><p>这里可以将3 - 8分解为两个连锁分支结构，其中</p>
+<ul>
+<li><p>3 - 6：<span class="math inline">\(n\)</span> + 1 = 4 + 1 =
+5</p></li>
+<li><p>7 - 8：<span class="math inline">\(n\)</span> + 1 = 2 + 1 =
+3</p></li>
+<li><p>故3 - 8的总用例数为3 <span class="math inline">\(\times\)</span>
+5 = 15</p></li>
+</ul></li>
+<li><p>2 - 8：<span class="math inline">\(n\)</span> + 1 = 15 + 1 =
+16</p></li>
+</ul></li>
+</ul>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142505675.png" alt="image-20220508142505675" style="zoom:80%;"></p>
+<ul>
+<li><strong>9 - 10</strong>：<span class="math inline">\(n\)</span> + 1
+= 2 + 1 = 3</li>
+</ul>
+<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142513887.png" alt="image-20220508142513887" style="zoom:80%;"></p>
+<ul>
+<li><strong>11 - 12</strong>：<span class="math inline">\(n\)</span> + 1
+= 2 + 1 = 3</li>
+</ul>
+<blockquote>
+<p>故总测试用例数 = 2 <span class="math inline">\(\times\)</span> 16
+<span class="math inline">\(\times\)</span> 3 <span class="math inline">\(\times\)</span> 3 = 288</p>
+</blockquote>
 ]]></content>
       <tags>
         <tag>软件测试</tag>
@@ -1905,349 +2250,6 @@ c，a、b和c均在1—100之间，a、b和c任意2个加起来大于第三个�
 <p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508120326033.png" alt="image-20220508120326033" style="zoom:80%;"></p>
 <p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508120344332.png" alt="image-20220508120344332" style="zoom:80%;"></p>
 <p><img src="/2022/05/02/%E9%BB%91%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508120355562.png" alt="image-20220508120355562" style="zoom:80%;"></p>
-]]></content>
-      <tags>
-        <tag>软件测试</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>序列化和反序列化</title>
-    <url>/2022/04/29/%E5%BA%8F%E5%88%97%E5%8C%96%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</url>
-    <content><![CDATA[<h4 id="序列化和反序列化的定义">序列化和反序列化的定义</h4>
-<p><strong>序列化</strong>：把对象转化为可传输的字节序列的过程</p>
-<p><strong>反序列化</strong>：把字节序列还原为对象的过程</p>
-<hr>
-<h4 id="为什么要序列化">为什么要序列化</h4>
-<p><strong>目的</strong>：让对象可以<strong>跨平台存储</strong>和进行<strong>网络传输</strong></p>
-<p><strong>因果</strong>：网络传输的方式是I/O <span class="math inline">\(\rightarrow\)</span> I/O支持的数据格式为字节数组
-<span class="math inline">\(\rightarrow\)</span>
-对象要传输需要序列化为字节序列</p>
-<p><strong>规范</strong>：序列化需要遵循规则，使得传输到目的地的字节序列能通过该规则反序列化还原为对象</p>
-<hr>
-<h4 id="需要序列化的场景">需要序列化的场景</h4>
-<p>凡是需要<strong>跨平台存储</strong>和<strong>网络传输</strong>的数据，都需要序列化</p>
-<p>网络传输本质：对象 <span class="math inline">\(\rightarrow\)</span>
-字节序列 <span class="math inline">\(\rightarrow\)</span> 网络 <span class="math inline">\(\rightarrow\)</span> 字节序列 <span class="math inline">\(\rightarrow\)</span> 对象</p>
-<p>跨平台存储本质：对象 <span class="math inline">\(\rightarrow\)</span>
-跨平台字节码 <span class="math inline">\(\rightarrow\)</span> 跨平台
-<span class="math inline">\(\rightarrow\)</span> 跨平台字节码 <span class="math inline">\(\rightarrow\)</span> 对象</p>
-<hr>
-<h4 id="序列化的选择">序列化的选择</h4>
-<p><strong>常见的序列化方式</strong></p>
-<p>不支持跨语言：JDK、Kryo、FST</p>
-<p>支持跨语言：JSON、Hessian、Thrift、Protostuff</p>
-<p><strong>序列化的速度</strong></p>
-<p>如果一个项目中需要序列化的场景很多，那么选择序列化效率高的协议能显著提高系统性能</p>
-<p><strong>序列化字节序列的大小</strong></p>
-<p>数据越小越好，传输快，提升系统性能</p>
-<hr>
-<h4 id="java中的序列化">Java中的序列化</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Java中要实现序列化，只需要实现Serializable接口即可</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment"> * 需要注意的问题</span></span><br><span class="line"><span class="comment"> * 1. static属性不能被序列化</span></span><br><span class="line"><span class="comment"> * 序列化保存的是对象的状态，静态变量属于类的状态，因此序列化不保存静态变量</span></span><br><span class="line"><span class="comment"> * 2. transient属性不会被序列化</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">transient</span> ElemType t;</span><br><span class="line">    <span class="keyword">private</span> ElemType e;    </span><br><span class="line">    <span class="comment">// 经过序列化和反序列化，t中的值会丢失(t == null)，e中的值不会丢失(e == something)</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<h4 id="序列化版本号serialversionuid">序列化版本号serialVersionUID</h4>
-<p>所有实现序列化的对象都必须有一个版本号，可以自定义，否则JDK工具会按照对象属性自动生成</p>
-<p><strong>版本号的用途</strong></p>
-<p>在序列化业务需求发生变化后，通过修改版本号告诉反序列化一方的对象需要同步修改</p>
-<p><strong>JDK自动生成的版本号和我们自定义的版本号的区别</strong></p>
-<p>JDK根据对象的属性信息生成版本号，意味着对象的属性和序列化版本号会同步改变</p>
-<p>坏处：只要对象有一点小变动版本号就会变更，用户必须强制更新软件，而现实需求应该是：<strong>用户可以选择不更新，不更新仅仅无法体验新增加的功能而已</strong>，而这时候就需要我们自定义的版本号了，<strong>只要序列化版本一样，对象新增属性不会影响反序列化对象</strong>。</p>
-<hr>
-<h4 id="父类子类序列化问题">父类、子类序列化问题</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="JAVA"><figure class="iseeu highlight /java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1.父类不实现序列化，子类实现序列化</span></span><br><span class="line"><span class="comment">// 父类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Parent</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String hobby;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">extends</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化后再反序列化</span></span><br><span class="line"><span class="comment">// 最终结果：父类结果未被序列化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2.父类实现序列化，子类不实现序列化</span></span><br><span class="line"><span class="comment">// 父类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> String hobby;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 子类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> <span class="keyword">extends</span> <span class="title class_">Parent</span> <span class="keyword">implements</span> <span class="title class_">Serializable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 序列化后再反序列化</span></span><br><span class="line"><span class="comment">// 最终结果：子类属性序列化正常</span></span><br></pre></td></tr></table></figure></div>
-]]></content>
-      <tags>
-        <tag>Java</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>白盒测试</title>
-    <url>/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/</url>
-    <content><![CDATA[<h2 id="白盒测试">白盒测试</h2>
-<p>白盒测试把程序视为一个<strong>透明的盒子</strong>，根据<strong>程序内部结构</strong>设计测试用例，测试需要<strong>覆盖全部代码的分支、路径和条件</strong></p>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220502000324686.png" alt="image-20220502000324686" style="zoom:67%;"></p>
-<p>白盒测试有<u>静态测试和动态测试</u>两种方法</p>
-<h2 id="静态测试程序结构分析">静态测试(程序结构分析)</h2>
-<h5 id="代码走查一组程序-错误检查技术">代码走查：一组程序 +
-错误检查技术</h5>
-<p>人员：组长(分配资料、安排计划) + 资深程序员 + 测试人员 +
-程序开发员</p>
-<p>内容：探讨代码编写思路</p>
-<h5 id="代码审查">代码审查</h5>
-<ol type="1">
-<li>检查代码和设计的一致性</li>
-<li>代码可读性</li>
-<li>代码逻辑正确性</li>
-<li>代码结构合理性</li>
-<li>公司整理的易错点checklist</li>
-</ol>
-<p>步骤：准备 <span class="math inline">\(\rightarrow\)</span> 程序阅读
-<span class="math inline">\(\rightarrow\)</span> 审查会 <span class="math inline">\(\rightarrow\)</span> 跟踪报告</p>
-<h5 id="控制流分析检查程序的控制结构">控制流分析：检查程序的控制结构</h5>
-<ul>
-<li><p><strong>程序流程图</strong></p>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508123614063.png" alt="image-20220508123614063" style="zoom:67%;"></p></li>
-<li><p><strong>控制流图(必考)</strong></p></li>
-</ul>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317170655642.png" alt="image-20220317170655642" style="zoom:60%;"></p>
-<ul>
-<li><strong>控制流图矩阵(控制流图的矩阵形式)</strong></li>
-</ul>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317170914579.png" alt="image-20220317170914579" style="zoom:67%;"></p>
-<h5 id="数据流分析程序错误">数据流分析(程序错误)</h5>
-<ul>
-<li><p>如果某一语句执行能<strong>改变变量x的值</strong>，则称x被该语句<strong>定义</strong></p></li>
-<li><p>如果某一语句执行了<strong>内存中变量x的值</strong>，则称x被该语句<strong>引用</strong></p></li>
-<li><p>常见的程序错误有：错拼名字、名字混淆、语句丢失等(一般都是编译器能检测的错误)</p></li>
-</ul>
-<h5 id="信息流分析">信息流分析</h5>
-<ul>
-<li>检查是否存在无用的语句</li>
-</ul>
-<h2 id="动态测试逻辑覆盖">动态测试(逻辑覆盖) ★★★★★</h2>
-<p>考虑如下程序：</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>(A &gt; <span class="number">1</span> &amp;&amp; B == <span class="number">0</span>)</span><br><span class="line">	X = X/A;</span><br><span class="line"><span class="keyword">if</span>(A == <span class="number">2</span> || X &gt; <span class="number">1</span>)</span><br><span class="line">	X = X + <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
-<p>其程序流程图为：</p>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317171842004.png" alt="image-20220317171842004" style="zoom:67%;"></p>
-<h3 id="语句覆盖">语句覆盖</h3>
-<p>设计若干个设计用例，然后运行被测程序，<strong>使程序中每个可执行语句至少执行一次</strong></p>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
-<p><strong>解释</strong>：蓝色的路径覆盖了所有<strong>语句</strong>(b和d路径上没有语句)，这条测试用例则实现了100%语句覆盖</p>
-<p><strong>测试用例</strong>：A = 2，B = 0，X = 3</p>
-<blockquote>
-<p>注意：用<strong>尽量少</strong>的设计用例覆盖所有可执行语句</p>
-<p>语句覆盖率 = 已执行 / 可执行 * 100%</p>
-</blockquote>
-<p><strong>优点</strong>：检查所有语句、简单易行、覆盖率高</p>
-<p><strong>缺点</strong>：以下是语句覆盖无法检测的错误</p>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="ARMASM"><figure class="iseeu highlight /armasm"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 条件语句错误</span></span><br><span class="line">A &gt; <span class="number">1</span> &amp;&amp; <span class="keyword">B</span> == <span class="number">0</span> -&gt; A &gt; <span class="number">0</span> &amp;&amp; <span class="keyword">B</span> == <span class="number">0</span></span><br><span class="line"><span class="comment">// 逻辑运算错误</span></span><br><span class="line">A &gt; <span class="number">1</span> &amp;&amp; <span class="keyword">B</span> == <span class="number">0</span> -&gt; A &gt; <span class="number">1</span> <span class="title">||</span> <span class="keyword">B</span> == <span class="number">0</span></span><br><span class="line"><span class="comment">// 循环次数错误</span></span><br><span class="line"><span class="symbol">for</span>(int i = <span class="number">0</span><span class="comment">; i &lt; n; i++) -&gt; for(int i = 0; i &lt;= n; i++)</span></span><br></pre></td></tr></table></figure></div>
-<h3 id="分支覆盖">分支覆盖</h3>
-<p>分支覆盖又称判定覆盖，<strong>程序流程图中每条边走一遍</strong></p>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651985586292.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
-<p><strong>解释</strong>：直观上看，就是把流程图所有能覆盖的线全部覆盖住，则分支覆盖就能达到100%</p>
-<table>
-<thead>
-<tr class="header">
-<th>测试用例</th>
-<th>覆盖路径</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>A = 2, B = 0, X = 3</td>
-<td>ace(蓝色)</td>
-</tr>
-<tr class="even">
-<td>A = 1, B = 0, X = 1</td>
-<td>abd(红色)</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>分支覆盖率 = 已判定 / 总判定</p>
-<p>分支覆盖的测试用例划分不止一种</p>
-<p>纠错能力比语句覆盖好一些</p>
-</blockquote>
-<h3 id="条件覆盖">条件覆盖</h3>
-<p>使得被测程序每个判断中的<strong>每个条件的可能取值至少要满足一次</strong></p>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="YAML"><figure class="iseeu highlight /yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">//</span> <span class="string">第一个条件</span></span><br><span class="line"><span class="attr">T1:</span> <span class="string">A</span> <span class="string">&gt;</span>  <span class="number">1</span>  </span><br><span class="line"><span class="attr">F1:</span> <span class="string">A</span> <span class="string">&lt;=</span> <span class="number">1</span></span><br><span class="line"><span class="attr">T2:</span> <span class="string">B</span> <span class="string">==</span> <span class="number">0</span></span><br><span class="line"><span class="attr">F2:</span> <span class="string">B</span> <span class="type">!=</span> <span class="number">0</span></span><br><span class="line"><span class="string">//</span> <span class="string">第二个条件</span></span><br><span class="line"><span class="attr">T3:</span> <span class="string">A</span> <span class="string">==</span> <span class="number">2</span></span><br><span class="line"><span class="attr">F3:</span> <span class="string">A</span> <span class="type">!=</span> <span class="number">2</span></span><br><span class="line"><span class="attr">T4:</span> <span class="string">X</span> <span class="string">&gt;</span>  <span class="number">1</span></span><br><span class="line"><span class="attr">F4:</span> <span class="string">X</span> <span class="string">&lt;=</span> <span class="number">1</span></span><br><span class="line"><span class="string">//</span> <span class="string">缺点：不能实现对每个分支的检查，用例数量增加</span></span><br></pre></td></tr></table></figure></div>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651986336995.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
-<p><strong>为什么需要abe？</strong></p>
-<p><strong>解释</strong>：因为仅有ace和abd的情况下，条件F2和F4没有被测试，而条件覆盖要求<strong>所有条件的正反面都要至少被测试一次</strong>。</p>
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: center;">用例编号</th>
-<th style="text-align: center;">ABX</th>
-<th style="text-align: center;">路径</th>
-<th style="text-align: center;">覆盖条件</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">203</td>
-<td style="text-align: center;">ace</td>
-<td style="text-align: center;">T1 T2 T3 T4</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">2</td>
-<td style="text-align: center;">101</td>
-<td style="text-align: center;">abd</td>
-<td style="text-align: center;">F1 T2 F3 T4</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">3</td>
-<td style="text-align: center;">211</td>
-<td style="text-align: center;">abe</td>
-<td style="text-align: center;">T1 <strong>F2</strong> T3
-<strong>F4</strong></td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>条件覆盖不是分支覆盖的超集</p>
-</blockquote>
-<h3 id="分支-条件覆盖">分支-条件覆盖</h3>
-<p>顾名思义，分支覆盖 + 条件覆盖</p>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="ARMASM"><figure class="iseeu highlight /armasm"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 第一个分支</span></span><br><span class="line">(<span class="number">1</span>) A &gt; <span class="number">1</span>,  <span class="keyword">B</span> == <span class="number">0</span>, 记为T1, T2</span><br><span class="line">(<span class="number">2</span>) A &gt; <span class="number">1</span>,  <span class="keyword">B</span> != <span class="number">0</span>, 记为T1, <span class="built_in">F2</span></span><br><span class="line">(<span class="number">3</span>) A &lt;= <span class="number">1</span>, <span class="keyword">B</span> == <span class="number">0</span>, 记为<span class="built_in">F1</span>, T2</span><br><span class="line">(<span class="number">4</span>) A &lt;= <span class="number">1</span>, <span class="keyword">B</span> != <span class="number">0</span>, 记为<span class="built_in">F1</span>, <span class="built_in">F2</span></span><br><span class="line"><span class="comment">// 第二个分支</span></span><br><span class="line">(<span class="number">5</span>) A == <span class="number">2</span>, X &gt;  <span class="number">1</span>, 记为T3, T4</span><br><span class="line">(<span class="number">6</span>) A == <span class="number">2</span>, X &lt;= <span class="number">1</span>, 记为T3, <span class="built_in">F4</span></span><br><span class="line">(<span class="number">7</span>) A != <span class="number">2</span>, X &gt;  <span class="number">1</span>, 记为<span class="built_in">F3</span>, T4</span><br><span class="line">(<span class="number">8</span>) A != <span class="number">2</span>, X &lt;= <span class="number">1</span>, 记为<span class="built_in">F3</span>, <span class="built_in">F4</span></span><br></pre></td></tr></table></figure></div>
-<p>太懒了，图略</p>
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: center;">用例编号</th>
-<th style="text-align: center;">ABX</th>
-<th style="text-align: center;">覆盖组合号</th>
-<th style="text-align: center;">路径</th>
-<th style="text-align: center;">覆盖条件</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">203</td>
-<td style="text-align: center;">(1)(5)</td>
-<td style="text-align: center;">ace</td>
-<td style="text-align: center;">T1 T2 T3 T4</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">2</td>
-<td style="text-align: center;">211</td>
-<td style="text-align: center;">(2)(6)</td>
-<td style="text-align: center;">abe</td>
-<td style="text-align: center;">T1 F2 T3 F4</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">3</td>
-<td style="text-align: center;">103</td>
-<td style="text-align: center;">(3)(7)</td>
-<td style="text-align: center;">abe</td>
-<td style="text-align: center;">F1 T2 F3 T4</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">111</td>
-<td style="text-align: center;">(4)(8)</td>
-<td style="text-align: center;">abd</td>
-<td style="text-align: center;">F1 F2 F3 F4</td>
-</tr>
-</tbody>
-</table>
-<p>解释：主要关注覆盖组合号和覆盖条件，要求如下：</p>
-<ul>
-<li>覆盖组合号：每条测试用例必须包含<strong>第一个分支和第二个分支的一种不同组合</strong></li>
-<li>覆盖条件：<strong>T1 - T4, F1 - F4</strong>的所有条件都需要覆盖</li>
-</ul>
-<blockquote>
-<p>漏掉了路径acd，并不是完备的测试</p>
-</blockquote>
-<h3 id="路径覆盖">路径覆盖：</h3>
-<p>覆盖程序中<strong>所有可能的路径</strong>(理想的测试程度)</p>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="XL"><figure class="iseeu highlight /xl"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="title">ace</span> -&gt;</span> L1</span><br><span class="line"><span class="function"><span class="title">abc</span> -&gt;</span> L2</span><br><span class="line"><span class="function"><span class="title">abe</span> -&gt;</span> L3</span><br><span class="line"><span class="function"><span class="title">acd</span> -&gt;</span> L4</span><br></pre></td></tr></table></figure></div>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/Inkedimage-20220317171842003_LI-1651987244264.jpg" alt="Inkedimage-20220317171842003_LI" style="zoom:67%;"></p>
-<p><strong>解释</strong>：组合数学原理，第一个分支有两个选择，第二个分支有两个选择，故共有2
-<span class="math inline">\(\times\)</span> 2 = 4种选择</p>
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: center;">用例编号</th>
-<th style="text-align: center;">ABX</th>
-<th style="text-align: center;">覆盖路径</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">1</td>
-<td style="text-align: center;">203</td>
-<td style="text-align: center;">ace(L1)</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">2</td>
-<td style="text-align: center;">101</td>
-<td style="text-align: center;">abd(L2)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">3</td>
-<td style="text-align: center;">211</td>
-<td style="text-align: center;">abe(L3)</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">301</td>
-<td style="text-align: center;">acd(L4)</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>路径测试虽然完备，但是当项目达到一定量级时，独立路径的数量会非常大</p>
-</blockquote>
-<h3 id="基本路径测试方法">基本路径测试方法</h3>
-<h5 id="四个步骤">四个步骤：</h5>
-<ol type="1">
-<li><p>画出程序的<strong>控制流图</strong></p></li>
-<li><p>计算程序的<strong>环形复杂度</strong></p>
-<ul>
-<li><p>一种为程序逻辑复杂度提供<strong>定量尺度</strong>的软件度量</p></li>
-<li><p>提供程序基本集的独立路径数量</p></li>
-<li><p><strong>计算方法</strong>：<span class="math inline">\(V = E - N
-+ 2\)</span>(<span class="math inline">\(E\)</span>是控制流图中边的数量，<span class="math inline">\(N\)</span>是节点数量)</p>
-<p>​ <span class="math inline">\(V = P + 1\)</span>(<span class="math inline">\(P\)</span>是控制流图中<strong>判定节点</strong>的数量)</p></li>
-</ul></li>
-<li><p>导出基本路径集，<strong>确定程序的独立路径</strong></p>
-<blockquote>
-<p>独立路径：和其他的独立路径相比，<strong>至少引入一个新处理语句或一个新判断的程序通路</strong></p>
-</blockquote></li>
-<li><p>根据独立路径，<strong>设计测试用例</strong>的输入数据和预期输出</p></li>
-</ol>
-<h3 id="最少测试用例数计算">最少测试用例数计算</h3>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220317194219038.png" alt="image-20220317194219038" style="zoom:67%;"></p>
-<p>对于嵌套型分支结构，若有<span class="math inline">\(n\)</span>个判定语句，需要<span class="math inline">\(n+1\)</span>个测试用例</p>
-<p>对于连锁型分支结构，若有<span class="math inline">\(n\)</span>个判定语句，需要有<span class="math inline">\(n*m\)</span>个测试用例</p>
-<h4 id="例子">例子</h4>
-<blockquote>
-<p>计算该程序的最少测试用例数</p>
-</blockquote>
-<figure>
-<img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508141945220.png" alt="image-20220508141945220">
-<figcaption aria-hidden="true">image-20220508141945220</figcaption>
-</figure>
-<blockquote>
-<p>将程序分解，可分为4个大的连锁分支结构</p>
-</blockquote>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142428384.png" alt="image-20220508142428384" style="zoom:80%;"></p>
-<ul>
-<li><strong>1</strong>：<span class="math inline">\(n\)</span> + 1 = 1 +
-1 = 2</li>
-</ul>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142455731.png" alt="image-20220508142455731" style="zoom:80%;"></p>
-<ul>
-<li><p><strong>2 - 8</strong>：可以分为2和3 - 8</p>
-<ul>
-<li><p>这里可以将3 - 8分解为两个连锁分支结构，其中</p>
-<ul>
-<li><p>3 - 6：<span class="math inline">\(n\)</span> + 1 = 4 + 1 =
-5</p></li>
-<li><p>7 - 8：<span class="math inline">\(n\)</span> + 1 = 2 + 1 =
-3</p></li>
-<li><p>故3 - 8的总用例数为3 <span class="math inline">\(\times\)</span>
-5 = 15</p></li>
-</ul></li>
-<li><p>2 - 8：<span class="math inline">\(n\)</span> + 1 = 15 + 1 =
-16</p></li>
-</ul></li>
-</ul>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142505675.png" alt="image-20220508142505675" style="zoom:80%;"></p>
-<ul>
-<li><strong>9 - 10</strong>：<span class="math inline">\(n\)</span> + 1
-= 2 + 1 = 3</li>
-</ul>
-<p><img src="/2022/05/08/%E7%99%BD%E7%9B%92%E6%B5%8B%E8%AF%95/image-20220508142513887.png" alt="image-20220508142513887" style="zoom:80%;"></p>
-<ul>
-<li><strong>11 - 12</strong>：<span class="math inline">\(n\)</span> + 1
-= 2 + 1 = 3</li>
-</ul>
-<blockquote>
-<p>故总测试用例数 = 2 <span class="math inline">\(\times\)</span> 16
-<span class="math inline">\(\times\)</span> 3 <span class="math inline">\(\times\)</span> 3 = 288</p>
-</blockquote>
 ]]></content>
       <tags>
         <tag>软件测试</tag>

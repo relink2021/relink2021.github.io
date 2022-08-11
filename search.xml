@@ -380,6 +380,36 @@ Factory：抽象工厂模式</h4>
       </tags>
   </entry>
   <entry>
+    <title>数据挖掘模型——ExtraTree</title>
+    <url>/2022/05/25/ExtraTree/</url>
+    <content><![CDATA[<blockquote>
+<p>参考资料：</p>
+<p><a href="https://scikit-learn.org/stable/modules/ensemble.html#extremely-randomized-trees">sklearn.org</a></p>
+<p><a href="https://blog.csdn.net/dili8870/article/details/101506670">模型融合---ExtraTree（极限树）总结</a></p>
+</blockquote>
+<h4 id="一什么是extratree">一、什么是ExtraTree</h4>
+<p>ExtraTree(极限树)和随机森林算法十分相似，都是由许多决策树构成。极限树与随机森林的主要区别在于：</p>
+<ul>
+<li>随机森林应用<strong>Bagging模型</strong>，extraTree使用<strong>所有的样本(不随机采样)</strong>，且特征随机选取，在某种程度上比随机森林得到的结果更好。</li>
+<li>随机森林在<strong>随机子集</strong>内得到最佳分叉属性，ET是<strong>完全随机</strong>得到分叉值。</li>
+</ul>
+<p>因此ExtraTree又称为Extremely Randomized
+Trees(极度随机化的树)，有点是能够进一步减少模型的方差，提高预测的稳定性，代价是偏差稍微增加，预测能力略微下降。</p>
+<blockquote>
+<p>对ExtraTree的了解非常有限，b站上没有任何一个专门的视频讲解ExtraTree</p>
+<p>总结一句话：如果需要稳定的预测，则使用极限树；如果需要更强的预测能力，则使用随机森林</p>
+</blockquote>
+<h4 id="二使用方法">二、使用方法</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="PYTHON"><figure class="iseeu highlight /python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> ExtraTreesClassifier</span><br><span class="line">clf = ExtraTreesClassifier(n_estimators=<span class="number">10</span>, max_depth=<span class="literal">None</span>,min_samples_split=<span class="number">2</span>, random_state=<span class="number">0</span>)</span><br><span class="line"><span class="comment"># 五则交叉验证</span></span><br><span class="line">scores = cross_val_score(clf, X, y, cv=<span class="number">5</span>)</span><br></pre></td></tr></table></figure></div>
+<p>主要参数是<code>n_estimators</code>和
+<code>max_features</code>，前者是森林中树的数量，默认值100；后者是寻找最佳分割是要考虑的特征数量。</p>
+]]></content>
+      <tags>
+        <tag>数据挖掘</tag>
+        <tag>机器学习</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Docker SDK for Golang</title>
     <url>/2022/07/20/Docker%20SDK%20for%20Golang/</url>
     <content><![CDATA[<p>Docker官方提供了一套Go语言的SDK，让开发者能够以进行Docker应用程序的构建和扩展</p>
@@ -512,36 +542,6 @@ Docker</p>
 ]]></content>
       <tags>
         <tag>docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据挖掘模型——ExtraTree</title>
-    <url>/2022/05/25/ExtraTree/</url>
-    <content><![CDATA[<blockquote>
-<p>参考资料：</p>
-<p><a href="https://scikit-learn.org/stable/modules/ensemble.html#extremely-randomized-trees">sklearn.org</a></p>
-<p><a href="https://blog.csdn.net/dili8870/article/details/101506670">模型融合---ExtraTree（极限树）总结</a></p>
-</blockquote>
-<h4 id="一什么是extratree">一、什么是ExtraTree</h4>
-<p>ExtraTree(极限树)和随机森林算法十分相似，都是由许多决策树构成。极限树与随机森林的主要区别在于：</p>
-<ul>
-<li>随机森林应用<strong>Bagging模型</strong>，extraTree使用<strong>所有的样本(不随机采样)</strong>，且特征随机选取，在某种程度上比随机森林得到的结果更好。</li>
-<li>随机森林在<strong>随机子集</strong>内得到最佳分叉属性，ET是<strong>完全随机</strong>得到分叉值。</li>
-</ul>
-<p>因此ExtraTree又称为Extremely Randomized
-Trees(极度随机化的树)，有点是能够进一步减少模型的方差，提高预测的稳定性，代价是偏差稍微增加，预测能力略微下降。</p>
-<blockquote>
-<p>对ExtraTree的了解非常有限，b站上没有任何一个专门的视频讲解ExtraTree</p>
-<p>总结一句话：如果需要稳定的预测，则使用极限树；如果需要更强的预测能力，则使用随机森林</p>
-</blockquote>
-<h4 id="二使用方法">二、使用方法</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="PYTHON"><figure class="iseeu highlight /python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> ExtraTreesClassifier</span><br><span class="line">clf = ExtraTreesClassifier(n_estimators=<span class="number">10</span>, max_depth=<span class="literal">None</span>,min_samples_split=<span class="number">2</span>, random_state=<span class="number">0</span>)</span><br><span class="line"><span class="comment"># 五则交叉验证</span></span><br><span class="line">scores = cross_val_score(clf, X, y, cv=<span class="number">5</span>)</span><br></pre></td></tr></table></figure></div>
-<p>主要参数是<code>n_estimators</code>和
-<code>max_features</code>，前者是森林中树的数量，默认值100；后者是寻找最佳分割是要考虑的特征数量。</p>
-]]></content>
-      <tags>
-        <tag>数据挖掘</tag>
-        <tag>机器学习</tag>
       </tags>
   </entry>
   <entry>
@@ -966,6 +966,211 @@ Results(关联结果)：脚本需要关联时，回放脚本的过程中记录�
       </tags>
   </entry>
   <entry>
+    <title>Linux三剑客之awk</title>
+    <url>/2022/05/18/awk/</url>
+    <content><![CDATA[<h3 id="简介">1. 简介</h3>
+<p>awk是一门<strong>编程语言</strong>，主要应用领域为数据<strong>过滤、统计和计算</strong>，在系统中通常用来处理日志数据。</p>
+<p>使用命令 <code>man awk</code> 查看awk的详细信息</p>
+<h3 id="执行过程">2. 执行过程</h3>
+<h4 id="示例代码">2.1 示例代码</h4>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">BEGIN&#123;<span class="built_in">print</span> <span class="string">&quot;name&quot;</span>&#125; 打印<span class="string">&#x27;name&#x27;</span>字符串</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">&#123;<span class="built_in">print</span> <span class="variable">$2</span>&#125; 打印每一行的第二列，前面可以加上条件</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">END&#123;<span class="built_in">print</span> <span class="string">&quot;end of file&quot;</span>&#125; 打印EOF</span></span><br><span class="line">awk -F, &#x27;BEGIN&#123;print &quot;name&quot;&#125;&#123;print $2&#125;END&#123;print &quot;end of file&quot;&#125;&#x27; test.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">带条件的awk命令，指定打印第二行第二列内容</span></span><br><span class="line">awk -F, &#x27;BEGIN&#123;print &quot;name&quot;&#125;NR==2&#123;print $2&#125;END&#123;print &quot;end of file&quot;&#125;&#x27; test.txt</span><br></pre></td></tr></table></figure></div>
+<h4 id="流程">2.2 流程</h4>
+<p><strong>读取文件之前</strong>：进行命令行赋值或设置命令行参数，并运行BEGIN{}方法体</p>
+<p><strong>读取文件过程</strong>：读取文件内容 <span class="math inline">\(\rightarrow\)</span> 判断是否满足结束条件 <span class="math inline">\(\rightarrow\)</span> 不满足则继续读取下一行 <span class="math inline">\(\rightarrow\)</span> EOF</p>
+<p><strong>读取文件之后</strong>：运行END{}方法体</p>
+<h3 id="常用操作">3. 常用操作</h3>
+<h4 id="行和列">3.1 行和列</h4>
+<p><strong>行</strong>：在awk中称为记录(record)，每一行默认通过回车分割</p>
+<p><strong>列</strong>：在awk中称为字段/域(field)，每一列默认通过空格分割</p>
+<blockquote>
+<p>awk中的行列结束标记都可以修改</p>
+</blockquote>
+<h5 id="取行">3.1.1 取行</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">NR：行号</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">符号包括 &gt; &lt; &lt;= &gt;= == !=</span></span><br><span class="line">NR == 1 # 取出第一行</span><br><span class="line">NR &gt;= 1 &amp;&amp; NR &lt;= 5 # 取出1~5行</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">直接索引</span></span><br><span class="line">awk &#x27;/kjournald/&#x27; test.txt # 取出所有带有&#x27;kjournald&#x27;记录</span><br></pre></td></tr></table></figure></div>
+<h5 id="取列">3.1.2 取列</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-F 指定分隔符(默认为空格/连续的空格/tab键)</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="variable">$1</span> 取出第1列</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="variable">$0</span> 表示整行的内容</span></span><br><span class="line">awk &#x27;&#123;print $6&#125;&#x27; test.txt # 取出第6列的全部内容</span><br><span class="line">awk NR==2&#x27;&#123;print $0&#125;&#x27; test.txt # 取出第2行的全部内容</span><br><span class="line">awk &#x27;&#123;print $1,$2&#125;&#x27; test.txt # 取出第1列和第2列的全部内容</span><br><span class="line">awk &#x27;&#123;print $1,$3,$5&#125;&#x27; test.txt |column -t # 取出第1,3,5列的全部内容，并进行对齐</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">NF：每行有多少字段</span></span><br><span class="line">awk &#x27;&#123;print $NF&#125;&#x27; test.txt # 取最后一列</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">结果间可以自定义分隔符</span></span><br><span class="line">awk &#x27;&#123;print $1 &quot;@&quot; $3&#125;&#x27; test.txt # 取出第1,3列，并以@分割</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">OFS: OutPut Field Separator，输出时的分隔符，默认为空格</span></span><br><span class="line">awk -F: -vOFS=: &#x27;&#123;print $NF,$2,$3,$4,$5,$6,$1&#125;&#x27; test.txt # 输出时默认以:分割</span><br></pre></td></tr></table></figure></div>
+<h4 id="awk模式匹配">3.2 awk模式匹配</h4>
+<p>了解awk的条件有哪些情况：</p>
+<ul>
+<li>比较符号： &gt; &lt; &gt;= &lt;= == !=</li>
+<li>正则表达式</li>
+<li>范围表达式</li>
+<li>特殊条件：BEGIN{} END{}</li>
+</ul>
+<h5 id="比较表达式">3.2.1 比较表达式</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line">awk &#x27;NR&gt;=1 &amp;&amp; NR &lt;=3&#x27; test.txt</span><br></pre></td></tr></table></figure></div>
+<h5 id="正则">3.2.2 正则</h5>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">正则</th>
+<th style="text-align: center;">awk正则</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">^ 表示以...开头的行</td>
+<td style="text-align: center;">某一列的开头</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">$ 表示以...结尾的行</td>
+<td style="text-align: center;">某一列的结尾</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">^$表示空行</td>
+<td style="text-align: center;">某一列的空(少用)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>支持扩展正则</li>
+<li>awk的正则可以精确到行，指定包含或不包含指定内容</li>
+<li>~包含</li>
+<li>!~不包含</li>
+</ul>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出第3列以1开头的行</span></span><br><span class="line">awk -F: &#x27;$3~/^1/&#x27; /etc/passwd</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找到第3列以2开头的行，并显示第1列，第3列和最后一列</span></span><br><span class="line">awk -F: &#x27;$3~/^2/&#123;print $1,$3,$NF&#125;&#x27; /etc/passwd</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找到第3列以1或2开头的行</span></span><br><span class="line">awk -F: &#x27;$3~/^[12]/&#123;print $1,$3,$NF&#125;&#x27; /etc/passwd</span><br></pre></td></tr></table></figure></div>
+<h5 id="范围表达式">3.2.3 范围表达式</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/哪里开始/,/哪里结束/ (最常用的语法)</span></span><br><span class="line">awk &#x27;/11:02:00/,/11:02:30/&#123;print $1&#125;&#x27; access.log # 打印30秒内日志的第一行</span><br></pre></td></tr></table></figure></div>
+<h5 id="特殊模式begin和end">3.2.3 特殊模式BEGIN{}和END</h5>
+<p><strong>BEGIN{}</strong>：awk读取文件前执行，用于：</p>
+<ul>
+<li>进行简单统计/计算，</li>
+<li>添加表头</li>
+<li>用来定义awk变量(少用，一般用-v)</li>
+</ul>
+<p><strong>END{}</strong>：awk读取文件后执行，用于：</p>
+<ul>
+<li>进行统计，输入计算结果</li>
+<li>awk使用数组，用来输出数组的结果</li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th>统计方法</th>
+<th>简写形式</th>
+<th>应用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>i = i + 1</td>
+<td>i++</td>
+<td>计数</td>
+</tr>
+<tr class="even">
+<td>sum = sum + ?</td>
+<td>sum += ?</td>
+<td>求和</td>
+</tr>
+<tr class="odd">
+<td>array[] = array[] + 1</td>
+<td>array[]++</td>
+<td>数组分类计数</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>sum和i都是<strong>变量</strong></p>
+</blockquote>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">统计 /etc/services里有多少个空行</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">i++ 每行进行统计 | <span class="built_in">print</span> i 输出结果</span> </span><br><span class="line">awk &#x27;/^$/&#123;i++&#125;END&#123;print i&#125;&#x27; /etc/services</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">计算1+2+3+...+100</span></span><br><span class="line">seq 100|awk &#x27;&#123;sum += $1&#125;END&#123;print sum&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看过程</span></span><br><span class="line">seq 100|awk &#x27;&#123;sum += $1;print sum&#125;END&#123;print sum&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+<h4 id="awk数组">3.3 awk数组</h4>
+<ul>
+<li>统计日志：统计每个ip出现次数，统计每种状态码的出现次数，统计攻击者ip出现次数</li>
+<li>统计每个ip消耗的流量</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 5%">
+<col style="width: 55%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th>shell数组</th>
+<th>awk数组</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">形式</td>
+<td>array[0] = token1 array[1] = token2</td>
+<td>array[0] = token1 array[1] = token2</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">使用</td>
+<td>echo ${array[0]} $(array[1]}</td>
+<td>print array[0] array[1]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">批处理</td>
+<td>for i in ${array[*]} <br>do <br> echo $i<br>done</td>
+<td>for(i in array)<br> print array[i]</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">错误写法：awk中所有字母都被识别为变量，字符串需要使用双引号围绕</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=token1;a[1]=token2;print a[0],a[1]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">正确写法</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=&quot;token1&quot;;a[1]=&quot;token2&quot;;print a[0],a[1]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">批处理</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=&quot;token1&quot;;a[1]=&quot;token2&quot;;for(i in a) print a[i]&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+<h5 id="范例一">范例一</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">处理以下文件内容，取出域名并进行计数和排序处理</span></span><br><span class="line">http://www.etiantian.org/index.html</span><br><span class="line">http://www.etiantian.org/index.html</span><br><span class="line">http://post.etiantian.org/index.html</span><br><span class="line">http://mp3.etiantian.org/index.html</span><br><span class="line">http://www.etiantian.org/3.html</span><br><span class="line">http://post.etiantian.org/2.html</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">需要计算</span></span><br><span class="line">www.etiantian.org 出现次数</span><br><span class="line">post.etiantian.org 出现次数</span><br><span class="line">mp3.etiantian.org 出现次数</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">代码</span></span><br><span class="line">awk -F/ &#x27;&#123;array[$3]++&#125;END&#123;for(i in array) print i,array[i]&#125;&#x27; test.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出结果</span></span><br><span class="line">mp3.etiantian.org 1</span><br><span class="line">www.etiantian.org 3</span><br><span class="line">post.etiantian.org 2</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">排序</span></span><br><span class="line">awk -F/ &#x27;&#123;array[$3]++&#125;END&#123;for(i in array) print i,array[i]&#125;&#x27; test.txt|sort -rnk2</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出结果</span></span><br><span class="line">www.etiantian.org 3</span><br><span class="line">post.etiantian.org 2</span><br><span class="line">mp3.etiantian.org 1</span><br></pre></td></tr></table></figure></div>
+<h4 id="awk循环和判断">3.4 awk循环和判断</h4>
+<h5 id="for循环">3.4.1 for循环</h5>
+<table>
+<colgroup>
+<col style="width: 56%">
+<col style="width: 43%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>shell的c语言for循环</th>
+<th>awk的for循环</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>for((i = 1; i &lt;= 10; i++)) <br>do<br> echo $n<br>done</td>
+<td>for(int i = 1; i &lt;= 10; i++)<br> print i</td>
+</tr>
+</tbody>
+</table>
+<p><div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line">awk &#x27;BEGIN&#123;</span><br><span class="line">for(i=1;i&lt;=100;i++)</span><br><span class="line">	sum+=i; </span><br><span class="line">	print sum;</span><br><span class="line">&#125;&#x27;</span><br></pre></td></tr></table></figure></div></p>
+<h5 id="if判断">3.4.2 if判断</h5>
+<table>
+<colgroup>
+<col style="width: 50%">
+<col style="width: 49%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>shell if判断</th>
+<th>awk if判断</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>if["token -eq 18"]; then <br> echo take to do sth<br>else<br>
+echo "rest"<br>pass</td>
+<td>if(condition)<br> print sth<br>else<br> print other</td>
+</tr>
+</tbody>
+</table>
+<h5 id="范例2">范例2</h5>
+<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">统计这段语句中，单词中字符数小于6的单词，并显示</span></span><br><span class="line">echo I am a student studing in XMU university</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">代码 length(<span class="variable">$i</span>) 统计第i列的长度</span></span><br><span class="line">echo I am a student studing in XMU university. |awk &#x27;&#123;for(i=1;i&lt;=NF;i++)&#123;if(length($i) &lt;6) print $i&#125;&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
+<h3 id="awk总结">4. awk总结</h3>
+<ul>
+<li><p>awk选项 -F -v</p></li>
+<li><p>awk执行流程</p></li>
+<li><p>awk取行取列</p></li>
+<li><p>awk模式：正则、范围、特殊模式</p></li>
+<li><p>awk数组</p></li>
+<li><p>awk控制：for / if</p></li>
+<li><p>awk帮助：man awk / info awk</p></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>软件测试概述</title>
     <url>/2022/05/01/Software%20Testing/</url>
     <content><![CDATA[<h2 id="软件测试的内涵">软件测试的内涵</h2>
@@ -1222,211 +1427,6 @@ vs 自动化测试：<u>从是否需要人工介入来区分</u></h4>
       </tags>
   </entry>
   <entry>
-    <title>Linux三剑客之awk</title>
-    <url>/2022/05/18/awk/</url>
-    <content><![CDATA[<h3 id="简介">1. 简介</h3>
-<p>awk是一门<strong>编程语言</strong>，主要应用领域为数据<strong>过滤、统计和计算</strong>，在系统中通常用来处理日志数据。</p>
-<p>使用命令 <code>man awk</code> 查看awk的详细信息</p>
-<h3 id="执行过程">2. 执行过程</h3>
-<h4 id="示例代码">2.1 示例代码</h4>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">BEGIN&#123;<span class="built_in">print</span> <span class="string">&quot;name&quot;</span>&#125; 打印<span class="string">&#x27;name&#x27;</span>字符串</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">&#123;<span class="built_in">print</span> <span class="variable">$2</span>&#125; 打印每一行的第二列，前面可以加上条件</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">END&#123;<span class="built_in">print</span> <span class="string">&quot;end of file&quot;</span>&#125; 打印EOF</span></span><br><span class="line">awk -F, &#x27;BEGIN&#123;print &quot;name&quot;&#125;&#123;print $2&#125;END&#123;print &quot;end of file&quot;&#125;&#x27; test.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">带条件的awk命令，指定打印第二行第二列内容</span></span><br><span class="line">awk -F, &#x27;BEGIN&#123;print &quot;name&quot;&#125;NR==2&#123;print $2&#125;END&#123;print &quot;end of file&quot;&#125;&#x27; test.txt</span><br></pre></td></tr></table></figure></div>
-<h4 id="流程">2.2 流程</h4>
-<p><strong>读取文件之前</strong>：进行命令行赋值或设置命令行参数，并运行BEGIN{}方法体</p>
-<p><strong>读取文件过程</strong>：读取文件内容 <span class="math inline">\(\rightarrow\)</span> 判断是否满足结束条件 <span class="math inline">\(\rightarrow\)</span> 不满足则继续读取下一行 <span class="math inline">\(\rightarrow\)</span> EOF</p>
-<p><strong>读取文件之后</strong>：运行END{}方法体</p>
-<h3 id="常用操作">3. 常用操作</h3>
-<h4 id="行和列">3.1 行和列</h4>
-<p><strong>行</strong>：在awk中称为记录(record)，每一行默认通过回车分割</p>
-<p><strong>列</strong>：在awk中称为字段/域(field)，每一列默认通过空格分割</p>
-<blockquote>
-<p>awk中的行列结束标记都可以修改</p>
-</blockquote>
-<h5 id="取行">3.1.1 取行</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">NR：行号</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">符号包括 &gt; &lt; &lt;= &gt;= == !=</span></span><br><span class="line">NR == 1 # 取出第一行</span><br><span class="line">NR &gt;= 1 &amp;&amp; NR &lt;= 5 # 取出1~5行</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">直接索引</span></span><br><span class="line">awk &#x27;/kjournald/&#x27; test.txt # 取出所有带有&#x27;kjournald&#x27;记录</span><br></pre></td></tr></table></figure></div>
-<h5 id="取列">3.1.2 取列</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">-F 指定分隔符(默认为空格/连续的空格/tab键)</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="variable">$1</span> 取出第1列</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="variable">$0</span> 表示整行的内容</span></span><br><span class="line">awk &#x27;&#123;print $6&#125;&#x27; test.txt # 取出第6列的全部内容</span><br><span class="line">awk NR==2&#x27;&#123;print $0&#125;&#x27; test.txt # 取出第2行的全部内容</span><br><span class="line">awk &#x27;&#123;print $1,$2&#125;&#x27; test.txt # 取出第1列和第2列的全部内容</span><br><span class="line">awk &#x27;&#123;print $1,$3,$5&#125;&#x27; test.txt |column -t # 取出第1,3,5列的全部内容，并进行对齐</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">NF：每行有多少字段</span></span><br><span class="line">awk &#x27;&#123;print $NF&#125;&#x27; test.txt # 取最后一列</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">结果间可以自定义分隔符</span></span><br><span class="line">awk &#x27;&#123;print $1 &quot;@&quot; $3&#125;&#x27; test.txt # 取出第1,3列，并以@分割</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">OFS: OutPut Field Separator，输出时的分隔符，默认为空格</span></span><br><span class="line">awk -F: -vOFS=: &#x27;&#123;print $NF,$2,$3,$4,$5,$6,$1&#125;&#x27; test.txt # 输出时默认以:分割</span><br></pre></td></tr></table></figure></div>
-<h4 id="awk模式匹配">3.2 awk模式匹配</h4>
-<p>了解awk的条件有哪些情况：</p>
-<ul>
-<li>比较符号： &gt; &lt; &gt;= &lt;= == !=</li>
-<li>正则表达式</li>
-<li>范围表达式</li>
-<li>特殊条件：BEGIN{} END{}</li>
-</ul>
-<h5 id="比较表达式">3.2.1 比较表达式</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line">awk &#x27;NR&gt;=1 &amp;&amp; NR &lt;=3&#x27; test.txt</span><br></pre></td></tr></table></figure></div>
-<h5 id="正则">3.2.2 正则</h5>
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: center;">正则</th>
-<th style="text-align: center;">awk正则</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">^ 表示以...开头的行</td>
-<td style="text-align: center;">某一列的开头</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">$ 表示以...结尾的行</td>
-<td style="text-align: center;">某一列的结尾</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">^$表示空行</td>
-<td style="text-align: center;">某一列的空(少用)</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>支持扩展正则</li>
-<li>awk的正则可以精确到行，指定包含或不包含指定内容</li>
-<li>~包含</li>
-<li>!~不包含</li>
-</ul>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出第3列以1开头的行</span></span><br><span class="line">awk -F: &#x27;$3~/^1/&#x27; /etc/passwd</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找到第3列以2开头的行，并显示第1列，第3列和最后一列</span></span><br><span class="line">awk -F: &#x27;$3~/^2/&#123;print $1,$3,$NF&#125;&#x27; /etc/passwd</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">找到第3列以1或2开头的行</span></span><br><span class="line">awk -F: &#x27;$3~/^[12]/&#123;print $1,$3,$NF&#125;&#x27; /etc/passwd</span><br></pre></td></tr></table></figure></div>
-<h5 id="范围表达式">3.2.3 范围表达式</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">/哪里开始/,/哪里结束/ (最常用的语法)</span></span><br><span class="line">awk &#x27;/11:02:00/,/11:02:30/&#123;print $1&#125;&#x27; access.log # 打印30秒内日志的第一行</span><br></pre></td></tr></table></figure></div>
-<h5 id="特殊模式begin和end">3.2.3 特殊模式BEGIN{}和END</h5>
-<p><strong>BEGIN{}</strong>：awk读取文件前执行，用于：</p>
-<ul>
-<li>进行简单统计/计算，</li>
-<li>添加表头</li>
-<li>用来定义awk变量(少用，一般用-v)</li>
-</ul>
-<p><strong>END{}</strong>：awk读取文件后执行，用于：</p>
-<ul>
-<li>进行统计，输入计算结果</li>
-<li>awk使用数组，用来输出数组的结果</li>
-</ul>
-<table>
-<thead>
-<tr class="header">
-<th>统计方法</th>
-<th>简写形式</th>
-<th>应用场景</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>i = i + 1</td>
-<td>i++</td>
-<td>计数</td>
-</tr>
-<tr class="even">
-<td>sum = sum + ?</td>
-<td>sum += ?</td>
-<td>求和</td>
-</tr>
-<tr class="odd">
-<td>array[] = array[] + 1</td>
-<td>array[]++</td>
-<td>数组分类计数</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>sum和i都是<strong>变量</strong></p>
-</blockquote>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">统计 /etc/services里有多少个空行</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">i++ 每行进行统计 | <span class="built_in">print</span> i 输出结果</span> </span><br><span class="line">awk &#x27;/^$/&#123;i++&#125;END&#123;print i&#125;&#x27; /etc/services</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">计算1+2+3+...+100</span></span><br><span class="line">seq 100|awk &#x27;&#123;sum += $1&#125;END&#123;print sum&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看过程</span></span><br><span class="line">seq 100|awk &#x27;&#123;sum += $1;print sum&#125;END&#123;print sum&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
-<h4 id="awk数组">3.3 awk数组</h4>
-<ul>
-<li>统计日志：统计每个ip出现次数，统计每种状态码的出现次数，统计攻击者ip出现次数</li>
-<li>统计每个ip消耗的流量</li>
-</ul>
-<table>
-<colgroup>
-<col style="width: 5%">
-<col style="width: 55%">
-<col style="width: 38%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: center;"></th>
-<th>shell数组</th>
-<th>awk数组</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: center;">形式</td>
-<td>array[0] = token1 array[1] = token2</td>
-<td>array[0] = token1 array[1] = token2</td>
-</tr>
-<tr class="even">
-<td style="text-align: center;">使用</td>
-<td>echo ${array[0]} $(array[1]}</td>
-<td>print array[0] array[1]</td>
-</tr>
-<tr class="odd">
-<td style="text-align: center;">批处理</td>
-<td>for i in ${array[*]} <br>do <br> echo $i<br>done</td>
-<td>for(i in array)<br> print array[i]</td>
-</tr>
-</tbody>
-</table>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">错误写法：awk中所有字母都被识别为变量，字符串需要使用双引号围绕</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=token1;a[1]=token2;print a[0],a[1]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">正确写法</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=&quot;token1&quot;;a[1]=&quot;token2&quot;;print a[0],a[1]&#125;&#x27;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">批处理</span></span><br><span class="line">awk &#x27;BEGIN&#123;a[0]=&quot;token1&quot;;a[1]=&quot;token2&quot;;for(i in a) print a[i]&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
-<h5 id="范例一">范例一</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">处理以下文件内容，取出域名并进行计数和排序处理</span></span><br><span class="line">http://www.etiantian.org/index.html</span><br><span class="line">http://www.etiantian.org/index.html</span><br><span class="line">http://post.etiantian.org/index.html</span><br><span class="line">http://mp3.etiantian.org/index.html</span><br><span class="line">http://www.etiantian.org/3.html</span><br><span class="line">http://post.etiantian.org/2.html</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">需要计算</span></span><br><span class="line">www.etiantian.org 出现次数</span><br><span class="line">post.etiantian.org 出现次数</span><br><span class="line">mp3.etiantian.org 出现次数</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">代码</span></span><br><span class="line">awk -F/ &#x27;&#123;array[$3]++&#125;END&#123;for(i in array) print i,array[i]&#125;&#x27; test.txt</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出结果</span></span><br><span class="line">mp3.etiantian.org 1</span><br><span class="line">www.etiantian.org 3</span><br><span class="line">post.etiantian.org 2</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">排序</span></span><br><span class="line">awk -F/ &#x27;&#123;array[$3]++&#125;END&#123;for(i in array) print i,array[i]&#125;&#x27; test.txt|sort -rnk2</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">输出结果</span></span><br><span class="line">www.etiantian.org 3</span><br><span class="line">post.etiantian.org 2</span><br><span class="line">mp3.etiantian.org 1</span><br></pre></td></tr></table></figure></div>
-<h4 id="awk循环和判断">3.4 awk循环和判断</h4>
-<h5 id="for循环">3.4.1 for循环</h5>
-<table>
-<colgroup>
-<col style="width: 56%">
-<col style="width: 43%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>shell的c语言for循环</th>
-<th>awk的for循环</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>for((i = 1; i &lt;= 10; i++)) <br>do<br> echo $n<br>done</td>
-<td>for(int i = 1; i &lt;= 10; i++)<br> print i</td>
-</tr>
-</tbody>
-</table>
-<p><div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line">awk &#x27;BEGIN&#123;</span><br><span class="line">for(i=1;i&lt;=100;i++)</span><br><span class="line">	sum+=i; </span><br><span class="line">	print sum;</span><br><span class="line">&#125;&#x27;</span><br></pre></td></tr></table></figure></div></p>
-<h5 id="if判断">3.4.2 if判断</h5>
-<table>
-<colgroup>
-<col style="width: 50%">
-<col style="width: 49%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>shell if判断</th>
-<th>awk if判断</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>if["token -eq 18"]; then <br> echo take to do sth<br>else<br>
-echo "rest"<br>pass</td>
-<td>if(condition)<br> print sth<br>else<br> print other</td>
-</tr>
-</tbody>
-</table>
-<h5 id="范例2">范例2</h5>
-<div class="highlight-wrap"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" contenteditable="true"data-rel="SHELL"><figure class="iseeu highlight /shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">统计这段语句中，单词中字符数小于6的单词，并显示</span></span><br><span class="line">echo I am a student studing in XMU university</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">代码 length(<span class="variable">$i</span>) 统计第i列的长度</span></span><br><span class="line">echo I am a student studing in XMU university. |awk &#x27;&#123;for(i=1;i&lt;=NF;i++)&#123;if(length($i) &lt;6) print $i&#125;&#125;&#x27;</span><br></pre></td></tr></table></figure></div>
-<h3 id="awk总结">4. awk总结</h3>
-<ul>
-<li><p>awk选项 -F -v</p></li>
-<li><p>awk执行流程</p></li>
-<li><p>awk取行取列</p></li>
-<li><p>awk模式：正则、范围、特殊模式</p></li>
-<li><p>awk数组</p></li>
-<li><p>awk控制：for / if</p></li>
-<li><p>awk帮助：man awk / info awk</p></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Linux</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hello World</title>
     <url>/2022/04/29/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very
@@ -1528,24 +1528,34 @@ x + \frac{x^2}{2!} + \frac{x^3}{3!} + o(x^3)\)</span></p>
 <p><span class="math inline">\(sinx \sim arcsinx \sim tanx \sim arctanx
 \sim e^x-1 \sim ln(x+1)\)</span></p>
 <p><span class="math inline">\(a^x-1 \sim xlna\)</span> <span class="math inline">\(\log_{a}{(x+1)} \sim \frac{x}{lna}\)</span> <span class="math inline">\((1+x)^m - 1 \sim mx\)</span> <span class="math inline">\(1-cos^2x\sim \frac 1 2x^2\)</span></p>
-<h4 id="三高阶求导公式">三、高阶求导公式</h4>
+<h4 id="三求导公式">三、求导公式</h4>
+<p><span class="math inline">\((a^x)&#39; = a^xlna\)</span> <span class="math inline">\((log_ax)&#39; = \frac{1}{xlna}\)</span> <span class="math inline">\((cosx)&#39; = -sinx\)</span> <span class="math inline">\((tanx)&#39; = sec^2x\)</span></p>
+<p><span class="math inline">\((arcsinx)&#39; =
+\frac{1}{\sqrt{1-x^2}}\)</span> <span class="math inline">\((arccosx)&#39; = -\frac{1}{\sqrt{1-x^2}}\)</span>
+<span class="math inline">\((arccotx)&#39; =
+-\frac{1}{1+x^2}\)</span></p>
+<p><span class="math inline">\((secx)&#39; = secxtanx\)</span> <span class="math inline">\((cotx)&#39; = -csc^2x\)</span> <span class="math inline">\((cscx)&#39; = -cscxcotx\)</span></p>
+<p><span class="math inline">\([ln(x+\sqrt{x^2+1})]&#39; =
+\frac{1}{\sqrt{x^2+1}}\)</span> <span class="math inline">\([ln(x+\sqrt{x^2-1})]&#39; =
+\frac{1}{\sqrt{x^2-1}}\)</span></p>
+<h4 id="四高阶求导公式">四、高阶求导公式</h4>
 <p><span class="math inline">\({(a^x)}^{(n)} = a^x(lna)^n(a&gt;0且a \ne
 1)\)</span> <span class="math inline">\((sin(kx))^{(n)}
 =k^nsin(kx+n\cdot \frac{\pi}{2})\)</span></p>
 <p><span class="math inline">\((lnx)^{(n)} = (-1)^n\frac{(n-1)!}{x^n}
 (x&gt;0)\)</span> <span class="math inline">\((xe^x)^{(n)} =
 (x+n)e^x\)</span></p>
-<h4 id="四对数指数运算法则">四、对数指数运算法则</h4>
+<h4 id="五对数指数运算法则">五、对数指数运算法则</h4>
 <p><span class="math inline">\(log_{a}b =
 \frac{log_{c}b}{log_c{a}}\)</span></p>
-<h4 id="五因式分解">五、因式分解</h4>
+<h4 id="六因式分解">六、因式分解</h4>
 <p><span class="math inline">\((x+y)^3 =
 x^3+3x^2y+3xy^2+y^3\)</span></p>
 <p><span class="math inline">\((x-y)^3 =
 x^3-3x^2y+3xy^2-y^3\)</span></p>
 <p><span class="math inline">\(x^3-y^3 = (x-y)(x^2+xy+y^2)\)</span></p>
 <p><span class="math inline">\(x^3+y^3 = (x+y)(x^2-xy+y^2)\)</span></p>
-<h4 id="六不等式">六、不等式</h4>
+<h4 id="七不等式">七、不等式</h4>
 <h5 id="绝对值不等式">1. 绝对值不等式</h5>
 <p><span class="math inline">\(\left | a\pm b \right | \le \left | a
 \right | + \left | b \right |\)</span></p>
